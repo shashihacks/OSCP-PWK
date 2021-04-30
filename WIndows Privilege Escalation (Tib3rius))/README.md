@@ -1,3 +1,6 @@
+#Windows Privilege Escalation
+
+
 ## 1.  Setup
 
 1. download/use the tools provided , to kali machine
@@ -70,3 +73,56 @@ user - `password321`
 
 
 ## 3. Privilege Escalation in Windows 
+
+- Privilege Escalation can be simple (e.g. a kernel exploit) or requires a lot of reconnaissance on the compromised system.
+
+- In a lot of cases, privilege escalation may not simply rely on a single misconfiguration, but may require you to think, and combine multiple misconfigurations.
+
+- All privilege escalations are effctively examples of access control violations.
+- Access control and user permissions are intriniscally linked.
+- When focusing on privilege escalations in Windows, understanding how Windows handles permissions is very important.
+
+### 3.1 Understanding Permissions in Windows
+
+
+**User Accounts**  
+- User accounts are used to log into windows sysrtem.
+- think of a user account as a collection of settings/preferences bound to a unique identity.
+- The local `administrator` account is created by default at installation.
+- Several other default user accounts may exist (e.g. `Guest`) depennding on ther version of windows. 
+
+**Service Accounts**
+
+- Service accounts are(somewhat obviously) used to run services in windows.
+- Service accounts cannot be used to sign into a windows system.
+- The ***System*** account is a default service account which has the highest privileges of any local account in windows.
+- Other default service accounts include ***NETWORK SERVICE*** and ***LOCAL SERVICE***
+
+
+**Groups**  
+- User accounts can belong to multiple Groups, and Groups can have multiple users.Groups can even belong to other Groups.
+- Groups allow for easier access control to resources, by setting up group wide permissions to all members of the group, rather than having to set the permissions individually.
+- Regular groups(e.g. Administrators, Users) have a set list of members.
+- Pseudo groups(e.g. "Authentication Users") have a dynamic list of members which changes based on certain ineteractions.  
+
+
+**Resources**  
+- In Windows, there are multiple type of resources(also known as objects):
+    - Files/Directories
+    - Registry entries
+    - Services
+- Whether a user and/or group has permission to perform a certain action on a resource depend on that resources's access control list(ACL).
+
+
+**ACLs & ACEs**  
+- Permissions to access a certain resource in windows are controlled by the access control list(ACL) for that resource.
+- Each ACL is made up of zero or more access control entries(ACEs).
+- Each ACE defines the relationship between a principle(e.g. a user, group) and a certain access right.
+
+![Access control list example](assets/ACL.PNG)
+
+
+
+
+<br><br/><br><br/><br><br/><br><br/><br><br/><br><br/>
+<br><br/><br><br/><br><br/><br><br/><br><br/><br><br/>
