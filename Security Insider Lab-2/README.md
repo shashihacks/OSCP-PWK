@@ -83,7 +83,14 @@ __2.__
     }
     ```
 
-however same validation used on client side can also be used.
+- Other functions like `htmlspecialchars()` `mysql_real_escape_string()` can be also be used
+
+E.g:  
+```php
+$query = sprintf("SELECT * FROM users WHERE user='%s' AND password='%s'",
+            mysql_real_escape_string($user),
+            mysql_real_escape_string($password));
+```
 
 
 ### Exercise 3: SQL Injection
@@ -131,6 +138,67 @@ __Solution:__
  ```php
     oldpwd=test'%20or%20'1'='1&newpwd1=test123&newpwd2=test123&submit=Submit
  ```
+
+
+<hr>
+
+
+
+### Exercise 4: SQL Injection - continued
+
+__1. Briefly describe how did you retrieve the information you need to create a new
+user.__
+
+
+
+
+
+### Exercise 5: Request Manipulation
+
+__1. Install a tool which allows you to manipulate requests of your browser. Briefly
+discuss your choice__
+__Solution :__
+
+Tool Installed: **Burpsuite**
+Reason: Burpsuite is a web proxy which allows to intercept, replay request from browser and offers additional fetaures like sniper attack,decoding payloads.
+
+__2. Briefly describe the steps to request a loan from your victim will benefit__  
+__Solution__
+
+- __step 1:__ configure web browser(change proxy settings) with burpsuite to intercept requests.
+- __step 2:__ Turn on the intercpt in burp `proxy`. 
+- __step 3:__ Go to ***Request a loan*** page and enter the required details and submit the request.
+> As the request is clicked burpsuite should intercept the request
+
+![request_loan_intercept](assets/request_loan_intercept.png)
+
+- __step 4:__ Modify  the Interest parameter from 4.2 to -4.2 (can be chnaged to whatever we want)
+
+![request_loan_intercept_tampered](assets/request_loan_intercept_tampered.png)
+
+- __step 5:__ forward the request. And Turn off the burp proxy
+- __step 6:__ Modified Interest rate can be seen on confirmation request. Click confirm.
+
+![loan_confirm](assets/loan_confirm.png)
+
+- Loan sucess can be seen
+
+![loan_sucess](assets/loan_sucess.png)
+- __step 7:__ To confirm go to `My Loans` page.
+
+![my_loans](assets/my_loans.png)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
