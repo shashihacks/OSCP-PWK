@@ -1,7 +1,8 @@
-### Exercise 2:
-__1Q :__  Identify a mechanism which protects the login process (not on the server) and
+### Exercise 2: : Client/Server Side Scripting
+
+__1 :__  Identify a mechanism which protects the login process (not on the server) and
 briefly describe the general security problem with this implementation.
-__1:__ 
+__Solution:__ 
 -   The client side script restricts the user input to avoid any kind of injection or malicious payload that can be entered through the input form.
 The following check is responsible for validation:
 
@@ -241,19 +242,67 @@ __Solution:__
 		exit;
 	}
 
-	if(!$http['period'] || !$http['period'] <= 0 || !is_numeric(http['period'])){
+	if(!$http['period'] || !$http['period'] <= 0 || !is_int(http['period'])){
 			$_SESSION['error'] .= "<p>You didn't specify a correct Period.</p><p>Please check your data and enter appropriate values!</p>";
 		htb_redirect(htb_getbaseurl().'index.php?page=htbloanreq');
 		exit;
 	}
 ```
 
+- **Result**
+
+![loan_interst_fixed](assets/loan_interest_fixed.PNG)
+
+
+<br>
+
+<hr>
 
 
 ### Exercise 6: Cross Site Scripting - XSS
 
 __1. Briefly explain what is an XSS attack in your own words?__
+__Solution:__ Cross site scripting is a web vulnerability, where untrusted useer input is processed without sanity checks,  allowing  malicous scripts to be injected in to the application.
 
+__2. Perform an XSS attack that opens a window with a nice message while another
+user uses his account. Briefly describe the required actions.__
+__Solution:__
+
+- __step 1:__ Navigate to `Transfer Funds` page.
+- __step 2:__ Enter `Destination Account No.` and `Amount` and in `Remark` enter the follwing script:  
+
+    ```javascript
+    <script>alert("Hello insider..");</script>  
+    ```
+
+    ![xss_payload](assets/xss.PNG)
+
+- __step 3:__ Click on `transfer`. After successful transfer go to the destination account. Alert box can be seen the user navigates to account page.
+![xss_payload](assets/xss_message.PNG)
+
+
+__3. What obvious checks did the developers miss to apply?__
+__Solution:__ User input is processed without validating(both on client and server side) and stored, allowing the attacker to execute the payload.
+
+
+__4. Identify the respective source code and eliminate the vulnerability(ies). Briefly summarise your changes.__
+__Solution:__
+
+- Vulnerable code:
+
+    ```php
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".$http['remark']."', ".$http['amount'].")";
+    $result = mysql_query($sql);
+
+    ```
+
+- Fixed code: 
+    ```php
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";
+    $result = mysql_query($sql);
+    ```  
+- Result:
+    ![xss_fixed](assets/xss_fixed.PNG)
 
 
 
