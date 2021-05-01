@@ -179,11 +179,11 @@ __Solution__
 - __step 5:__ forward the request. And Turn off the burp proxy
 - __step 6:__ Modified Interest rate can be seen on confirmation request. Click confirm.  
 
-![loan_confirm](assets/loan_confirm.png)  
+![loan_confirm](assets/loan_confirm.PNG)  
 
 - Loan sucess can be seen
 
-![loan_sucess](assets/loan_sucess.png)
+![loan_sucess](assets/loan_sucess.PNG)
 
 - __step 7:__ To confirm go to `My Loans` page.
 
