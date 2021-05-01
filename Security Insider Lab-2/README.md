@@ -177,13 +177,14 @@ __Solution__
 ![request_loan_intercept_tampered](assets/request_loan_intercept_tampered.png)
 
 - __step 5:__ forward the request. And Turn off the burp proxy
-- __step 6:__ Modified Interest rate can be seen on confirmation request. Click confirm.
+- __step 6:__ Modified Interest rate can be seen on confirmation request. Click confirm.  
 
-![loan_confirm](assets/loan_confirm.png)
+![loan_confirm](assets/loan_confirm.png)  
 
 - Loan sucess can be seen
 
 ![loan_sucess](assets/loan_sucess.png)
+
 - __step 7:__ To confirm go to `My Loans` page.
 
 ![my_loans](assets/my_loans.png)
