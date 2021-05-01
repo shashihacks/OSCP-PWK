@@ -170,18 +170,18 @@ __Solution__
 - __step 3:__ Go to ***Request a loan*** page and enter the required details and submit the request.
 > As the request is clicked burpsuite should intercept the request
 
-![request_loan_intercept](assets/request_loan_intercept.png)
+![request_loan_intercept](assets/request_loan_intercept.PNG)
 
 - __step 4:__ Modify  the Interest parameter from 4.2 to -4.2 (can be chnaged to whatever we want)
 
 ![request_loan_intercept_tampered](assets/request_loan_intercept_tampered.png)
 
 - __step 5:__ forward the request. And Turn off the burp proxy
-- __step 6:__ Modified Interest rate can be seen on confirmation request. Click confirm.  
+- __step 6:__ Modified Interest rate can be seen on `Loan Request confirmation`. Click `confirm`.  
 
 ![loan_confirm](assets/loan_confirm.PNG)  
 
-- Loan sucess can be seen
+- Loan sucess can be seen (Ignore the error messages)
 
 ![loan_sucess](assets/loan_sucess.PNG)
 
@@ -190,6 +190,69 @@ __Solution__
 ![my_loans](assets/my_loans.png)
 
 
+__3. What enables this type of attack? Identify the respective source code and give
+the vulnerability a name.__
+
+__solution:__ Failing to server side validation of received parameters allow the attacker to modify the request and successfully execute.
+Although adding client side validation have nos ignificant effect as this can be bypassed too.
+
+- code responsible for allowing the attack
+
+ ```php
+	if(isset($http['submit']) && $http['submit'] == "Confirm") {
+		$sql="update ".$htbconf['db/accounts']." set ".$htbconf['db/accounts.curbal']."=".$htbconf['db/accounts.curbal']." + \"".($http['loan'])."\", ".$htbconf['db/accounts.time']."=now() where ".$htbconf['db/accounts.account']."=\"".($http['creditacc'] ^ $xorValue)."\"";
+		mysql_query($sql, $db_link);
+		$sql="insert into ".$htbconf['db/loans']." (".$htbconf['db/loans.owner'].", ".$htbconf['db/loans.amount'].", ".$htbconf['db/loans.interest'].", ".$htbconf['db/loans.period'].", ".$htbconf['db/loans.debitacc'].", ".$htbconf['db/loans.creditacc'].", ".$htbconf['db/loans.time'].") values(".$_SESSION['userid'].",".$http['loan'].",".$http['interest'].",".$http['period'].",".($http['debitacc'] ^ $xorValue).",".($http['creditacc'] ^ $xorValue).", now())";
+		mysql_query($sql, $db_link);
+				var_dump($_SESSION);
+		$_SESSION['success'] .= "<p>Loan granted</p>\n";
+		htb_redirect(htb_getbaseurl().'index.php?page=htbaccounts');
+		exit;
+	}
+
+ ```
+
+ - As we can see the received data is used to query using mysql without validatng.
+ - Akthough there is a validation on loan amount, which is not effective in stopping the attack.
+
+```php
+	if(!$http['loan'] || $http['loan'] <= 0) {
+		$_SESSION['error'] .= "<p>You didn't specify a correct loan.</p><p>Please check your data and enter appropriate values!</p>";
+		htb_redirect(htb_getbaseurl().'index.php?page=htbloanreq');
+		exit;
+	}
+```
+
+- Vulnerability Name : **Paramater Tampering Vulnerability**
+
+
+__4. Show how to fix this vulnerability. Implement your patch and briefly summarize
+your changes.__
+
+__Solution:__
+
+- Using server side validations on all input data
+- Following validations will fix the vulnerability.  
+
+```php
+	if(!$http['interest'] || !$http['interest'] != 4.2){
+			$_SESSION['error'] .= "<p>You didn't specify a correct Interest.</p><p>Please check your data and enter appropriate values!</p>";
+		htb_redirect(htb_getbaseurl().'index.php?page=htbloanreq');
+		exit;
+	}
+
+	if(!$http['period'] || !$http['period'] <= 0 || !is_numeric(http['period'])){
+			$_SESSION['error'] .= "<p>You didn't specify a correct Period.</p><p>Please check your data and enter appropriate values!</p>";
+		htb_redirect(htb_getbaseurl().'index.php?page=htbloanreq');
+		exit;
+	}
+```
+
+
+
+### Exercise 6: Cross Site Scripting - XSS
+
+__1. Briefly explain what is an XSS attack in your own words?__
 
 
 
