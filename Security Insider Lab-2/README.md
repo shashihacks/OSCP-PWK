@@ -17,11 +17,12 @@
 <hr>
 <br>
 
-### Exercise 2: : Client/Server Side Scripting
+### Exercise 2: : Client/Server Side Scripting  
 
 __1 : Identify a mechanism which protects the login process (not on the server) and
-briefly describe the general security problem with this implementation.__
-__Solution:__ 
+briefly describe the general security problem with this implementation.__  
+
+__Solution:__   
 -   The client side script restricts the user input to avoid any kind of injection or malicious payload that can be entered through the input form.
 The following check is responsible for validation:
 
@@ -64,11 +65,11 @@ The above request can be captured and replayed without the need to enter the inp
 
 
 
-__2.__ 
-    - __Step 1:__ capture the URL on login page on submit
-    - __Step 2:__ modify the parameters (`username` and `password`) and submit through   browser or web proxy(in our case- ___burpsuite___)
+__2.__    
+    - __Step 1:__ capture the URL on login page on submit  
+    - __Step 2:__ modify the parameters (`username` and `password`) and submit through   browser or web proxy(in our case- ___burpsuite___)  
     - __Step 3:__ send the request from the burpsuite and reload the page.
-    - Payload used:  
+    - Payload used:    
 
 ```php
 /htdocs/login.php?username=alex'%23&password=test123
@@ -164,8 +165,9 @@ GET /htdocs/login.php?username=testuser&password=testpass'+or+'1'='1
 
 
 __3. Change the password of the user you are logged in with. Briefly describe your
-actions and indicate the source code allowing for this attack.__
-__Solution:__
+actions and indicate the source code allowing for this attack.__  
+
+__Solution:__  
 **step 1**: find the page that is responsible for password change
     
 ```bash 
@@ -260,7 +262,8 @@ __Solution:__
     ```php
         GET /htdocs/login.php?username=alex'and 1=2 union select 1,2,3,group_concat(column_name),5,6,7,8 from information_schema.columns where table_schema = database() and table_name ='users'#&password=test123 
     ```  
-    ![column_names](assets/column_names.png)
+    ![column_names](assets/column_names.png)  
+
 
 __2. Briefly describe the actions required to create a new user.__
 
@@ -436,11 +439,13 @@ __Solution:__
 
     ![xss_payload](assets/xss.PNG)   
 
-- __step 3:__ Click on `transfer`. After successful transfer go to the destination account. Alert box can be seen the user navigates to account page.
+- __step 3:__ Click on `transfer`. After successful transfer go to the destination account. Alert box can be seen the user navigates to account page.  
+
 ![xss_payload](assets/xss_message.PNG)
 
 
-__3. What obvious checks did the developers miss to apply?__
+__3. What obvious checks did the developers miss to apply?__  
+
 __Solution:__ User input is processed without validating(both on client and server side) and stored, allowing the attacker to execute the payload.
 
 
