@@ -287,7 +287,7 @@ __Solution:__ Naive solution could be removing write permissions to the databse 
 __4. Implement at least one protection mechanism. Show it in action preventing SQL
 injection.__
 __Solution :__  
-- Prepared statements 
+- Prepared statement 
 - ```php
     if ($stmt = $link->prepare("SELECT id,password,username,name,firstname,time,lasttime,lastip from users where username =? and password=?")) {   
     	$stmt->bind_param("ss", $username,$password);
