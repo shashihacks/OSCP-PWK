@@ -12,6 +12,11 @@
 
 
 
+
+<br>
+<hr>
+<br>
+
 ### Exercise 2: : Client/Server Side Scripting
 
 __1 : Identify a mechanism which protects the login process (not on the server) and
@@ -71,7 +76,7 @@ __2.__
 > `%23` represents `#` to comment the succeding parameters
 
 
-![validation-bypass](https://raw.githubusercontent.com/shashihacks/oscp-new/master/Security%20Insider%20Lab-2/assets/validation_bypass.PNG?token=AD4TE53ABTNEZCNJDB4SXJ3ASECMC)
+![validation-bypass](assets/validation_bypass.PNG)
 
 3. __Better solution:__
     - Validate the user input on the server side and return if input is other than the whitelisted characters  
@@ -106,6 +111,11 @@ $query = sprintf("SELECT * FROM users WHERE user='%s' AND password='%s'",
             mysql_real_escape_string($password));
 ```
 
+
+
+<br>
+<hr>
+<br>
 
 ### Exercise 3: SQL Injection
 
@@ -191,9 +201,10 @@ __Solution:__
 
  - Password has been successfully changed
 
+
+<br>
 <hr>
-
-
+<br>
 
 ### Exercise 4: SQL Injection - continued
 
@@ -299,6 +310,10 @@ __Solution :__
 
 ![sql_fixed](assets/sql_fixed.PNG)
 
+<br>
+<hr>
+<br>
+
 ### Exercise 5: Request Manipulation
 
 __1. Install a tool which allows you to manipulate requests of your browser. Briefly
@@ -400,9 +415,8 @@ __Solution:__
 
 
 <br>
-
 <hr>
-
+<br>
 
 ### Exercise 6: Cross Site Scripting - XSS
 
@@ -457,6 +471,6 @@ __Solution:__
 
 
 
-<br></br><br></br><br></br><br></br><br></br><br></br><br></br>
+<br></br><br></br><br></br><br>
     
         
