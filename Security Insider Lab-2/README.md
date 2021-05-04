@@ -251,7 +251,7 @@ __Solution:__
          GET /htdocs/login.php?username=alex' and 1=2 union select 1,2,group_concat(table_name),4,5,6,7,8 from information_schema.tables where table_schema = database()#&password=test123
     ```
 
-    ![table_names](assets/table_names.PNG)
+    ![table_names](assets/table_names.png)
 
 - __step 4:__ Retrive column names
 
@@ -260,7 +260,7 @@ __Solution:__
     ```php
         GET /htdocs/login.php?username=alex'and 1=2 union select 1,2,3,group_concat(column_name),5,6,7,8 from information_schema.columns where table_schema = database() and table_name ='users'#&password=test123 
     ```  
-    ![column_names](assets/column_names.PNG)
+    ![column_names](assets/column_names.png)
 
 __2. Briefly describe the actions required to create a new user.__
 
@@ -271,7 +271,7 @@ __solution__
     ```php
         GET /htdocs/login.php?username=alex'; INSERT INTO users(id, username, password,name,firstname) VALUES(99999,"charlie", "password123", 'charlie','chaplin')#&password=asd&password=test123
     ```
-    ![new_user](assets/new_user.PNG)
+    ![new_user](assets/new_user.png)
     <br>
     ![loggedin_new_user](assets/loggedin_new_user.PNG)
 
@@ -331,24 +331,24 @@ __Solution__
 - __step 3:__ Go to ***Request a loan*** page and enter the required details and submit the request.
 > As the request is clicked burpsuite should intercept the request
 
-![request_loan_intercept](assets/request_loan_intercept.PNG)
+![request_loan_intercept](assets/request_loan_intercept.PNG)  
 
-- __step 4:__ Modify  the Interest parameter from 4.2 to -4.2 (can be chnaged to whatever we want)
+- __step 4:__ Modify  the Interest parameter from 4.2 to -4.2 (can be chnaged to whatever we want)  
 
-![request_loan_intercept_tampered](assets/request_loan_intercept_tampered.png)
+![request_loan_intercept_tampered](assets/request_loan_intercept_tampered.png)  
 
 - __step 5:__ forward the request. And Turn off the burp proxy
 - __step 6:__ Modified Interest rate can be seen on `Loan Request confirmation`. Click `confirm`.  
 
-![loan_confirm](assets/loan_confirm.PNG)  
+![loan_confirm](assets/loan_confirm.PNG)    
 
 - Loan sucess can be seen (Ignore the error messages)
 
-![loan_sucess](assets/loan_sucess.PNG)
+![loan_sucess](assets/loan_sucess.PNG)  
 
-- __step 7:__ To confirm go to `My Loans` page.
+- __step 7:__ To confirm go to `My Loans` page.  
 
-![my_loans](assets/my_loans.png)
+![my_loans](assets/my_loans.png)  
 
 
 __3. What enables this type of attack? Identify the respective source code and give
@@ -409,9 +409,9 @@ __Solution:__
 	}
 ```
 
-- **Result**
+- **Result**  
 
-![loan_interst_fixed](assets/loan_interest_fixed.PNG)
+![loan_interst_fixed](assets/loan_interest_fixed.PNG)  
 
 
 <br>
@@ -434,7 +434,7 @@ __Solution:__
     <script>alert("Hello insider..");</script>  
     ```
 
-    ![xss_payload](assets/xss.PNG)
+    ![xss_payload](assets/xss.PNG)   
 
 - __step 3:__ Click on `transfer`. After successful transfer go to the destination account. Alert box can be seen the user navigates to account page.
 ![xss_payload](assets/xss_message.PNG)
@@ -447,7 +447,7 @@ __Solution:__ User input is processed without validating(both on client and serv
 __4. Identify the respective source code and eliminate the vulnerability(ies). Briefly summarise your changes.__
 __Solution:__
 
-- Vulnerable code:
+- Vulnerable code:  
 
     ```php
     $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".$http['remark']."', ".$http['amount'].")";
@@ -455,12 +455,13 @@ __Solution:__
 
     ```
 
-- Fixed code: 
+- Fixed code:   
     ```php
     $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";
     $result = mysql_query($sql);
     ```  
-- Result:
+- Result:  
+
     ![xss_fixed](assets/xss_fixed.PNG)
 
 
