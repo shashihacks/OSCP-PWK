@@ -1,7 +1,7 @@
 ### Exercise 1: Setup
 
 1. Install MySQL and PHP 5.6.40.
-2. unzipped the contents in web root directory `/var/www/html`.
+2. unzip the contents in web root directory `/var/www/html`.
 3. Changed the `config.php` with valid db credentails and directory for web access.
 4. Import the vbank.sql into the mysql database using the command below
 
