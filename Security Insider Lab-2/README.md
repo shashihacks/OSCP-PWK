@@ -270,7 +270,34 @@ __Solution:__ Naive solution could be removing write permissions to the databse 
 
 __4. Implement at least one protection mechanism. Show it in action preventing SQL
 injection.__
-__Solution :__
+__Solution :__  
+- stored procedures 
+- ```php
+        function get_result(\mysqli_stmt $statement){
+            $result = array();
+            $statement->store_result();
+            for ($i = 0; $i < $statement->num_rows; $i++)
+            {
+                $metadata = $statement->result_metadata();
+                $params = array();
+                while ($field = $metadata->fetch_field())
+                {
+                    $params[] = &$result[$i][$field->name];
+                }
+                call_user_func_array(array($statement, 'bind_result'), $params);
+                $statement->fetch();
+            }
+            return $result;
+        }
+    ```
+
+
+- Perform sql injection with the same payload as before
+- Submit the request
+- Application throws error message, after adding the stored procedures tio prevent sql injection
+- __Result:__
+
+![sql_fixed](assets/sql_fixed.PNG)
 
 ### Exercise 5: Request Manipulation
 
