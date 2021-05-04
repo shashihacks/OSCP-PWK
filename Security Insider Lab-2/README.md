@@ -278,7 +278,7 @@ __solution__
     <br>  <br>  <br>
     ![loggedin_new_user](assets/loggedin_new_user.PNG) 
 
-    
+
 
 __3. Give an additional precaution (apart from those you have given already) that
 may prevent this manipulation.__
@@ -389,9 +389,10 @@ Although adding client side validation have nos ignificant effect as this can be
 	}
 ```
 
-- Vulnerability Name : **Paramater Tampering Vulnerability**
 
+- Vulnerability Name : **Paramater Tampering Vulnerability**  
 
+  
 __4. Show how to fix this vulnerability. Implement your patch and briefly summarize
 your changes.__
 
@@ -467,7 +468,7 @@ __Solution:__
     $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";
     $result = mysql_query($sql);
     ```  
-- Result:  
+- __Result:__  
 
     ![xss_fixed](assets/xss_fixed.PNG)
 
