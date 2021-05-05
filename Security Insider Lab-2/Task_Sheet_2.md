@@ -19,3 +19,14 @@ __Solution__
     - Request gets sent on behalf of malicous users so the  request procesess successfully.
 
 
+### Task 2
+
+__Q: What is the difference between XSS and CSRF/XSRF from their execution perspective?__  
+__Solution:__ If a website is vulnerable to stored XSS, execution of commands on behalf of victim is easy and does'nt require to setup a malicous website. In case of Cross-site request forgery,, the excution requires, the authentication victim from vulnerable website to visit the malicouis website setup by the attacker in order to execute the commands/requests.
+
+__Briefly explain why your bank is theoretically vulnerable to CSRF/XSRF attack!__  
+__Solution:__ After examining the web request, on `Transfer Funds` page , the website doesn't seem to send  any unique identifier or tokens , that identify the request as being originated from the same domain, or performed by the actual user.
+
+![funds_transfer](images/task2/funds_transfer.PNG)
+
+
