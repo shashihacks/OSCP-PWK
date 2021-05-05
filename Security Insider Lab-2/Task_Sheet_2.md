@@ -16,6 +16,6 @@ __Solution__
     - Create a script or source(like, `img` tags, `iframe`) that executes the request to transfer funds.
     - Allow the  authenticated victim to access the malicous website
     - Send the fund transfer request . (Since the victim is authenticated and the URL/script is crafted to transfer funds, cookies stored on victim's broswer also be sent)
-    - Request procesess succfully.
+    - Request gets sent on behalf of malicous users so the  request procesess successfully.
 
 
