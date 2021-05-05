@@ -17,8 +17,8 @@
 ### Exercise 1: Setup
 
 1. Install MySQL and PHP 5.6.40.
-2. unzipped the contents in web root directory `/var/www/html`.
-3. Changed the `config.php` with valid db credentails and directory for web access.
+2. unzip the contents in web root directory `/var/www/html`.
+3. Change the `config.php` with valid db credentails and directory for web access.
 4. Import the vbank.sql into the mysql database using the command below
 
     ```sql
@@ -83,7 +83,7 @@ The above request can be captured and replayed without the need to enter the inp
 
 __2.__    
     - __Step 1:__ capture the URL on login page on submit.  
-    - __Step 2:__ modify the parameters (`username` and `password`) and submit through   browser or web proxy(in our case- ___burpsuite___).  
+    - __Step 2:__ modify the parameters (`username` and `password`) and submit through   browser or web proxy (in our case- ___burpsuite___).  
     - __Step 3:__ send the request from the burpsuite and reload the page.
     - Payload used:    
 
@@ -386,7 +386,7 @@ Although adding client-side validation have no significant effect as this can be
  ```
 
  - As we can see the received data is used in mysql query without validating.
- - Although there is a validation on loan amount, which is not effective to preventing the attack.
+ - Although there is a validation on loan amount, which is not effective to prevent the attack.
 
 ```php
 	if(!$http['loan'] || $http['loan'] <= 0) {
