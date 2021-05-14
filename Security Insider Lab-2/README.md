@@ -1,8 +1,24 @@
+
+### Table of Contents
+
+- [Exercise 1: Setup](#exercise-1--setup)
+
+- [Exercise 2:  Client/Server Side Scripting](#exercise-2----client-server-side-scripting)
+
+- [Exercise 3: SQL Injection](#exercise-3--sql-injection)
+
+- [Exercise 4: SQL Injection - continued](#exercise-4--sql-injection---continued)
+
+- [Exercise 5: Request Manipulation](#exercise-5--request-manipulation)
+
+- [Exercise 6: Cross Site Scripting - XSS](#exercise-6--cross-site-scripting---xss)
+
+
 ### Exercise 1: Setup
 
 1. Install MySQL and PHP 5.6.40.
-2. unzipped the contents in web root directory `/var/www/html`.
-3. Changed the `config.php` with valid db credentails and directory for web access.
+2. unzip the contents in web root directory `/var/www/html`.
+3. Change the `config.php` with valid db credentails and directory for web access.
 4. Import the vbank.sql into the mysql database using the command below
 
     ```sql
@@ -67,7 +83,7 @@ The above request can be captured and replayed without the need to enter the inp
 
 __2.__    
     - __Step 1:__ capture the URL on login page on submit.  
-    - __Step 2:__ modify the parameters (`username` and `password`) and submit through   browser or web proxy(in our case- ___burpsuite___).  
+    - __Step 2:__ modify the parameters (`username` and `password`) and submit through   browser or web proxy (in our case- ___burpsuite___).  
     - __Step 3:__ send the request from the burpsuite and reload the page.
     - Payload used:    
 
@@ -287,7 +303,7 @@ __Solution:__ Naive solution could be removing write permissions to the databse 
 __4. Implement at least one protection mechanism. Show it in action preventing SQL
 injection.__
 __Solution :__  
-- stored procedures 
+- Prepared statement 
 - ```php
     if ($stmt = $link->prepare("SELECT id,password,username,name,firstname,time,lasttime,lastip from users where username =? and password=?")) {   
     	$stmt->bind_param("ss", $username,$password);
@@ -370,7 +386,7 @@ Although adding client-side validation have no significant effect as this can be
  ```
 
  - As we can see the received data is used in mysql query without validating.
- - Although there is a validation on loan amount, which is not effective to preventing the attack.
+ - Although there is a validation on loan amount, which is not effective to prevent the attack.
 
 ```php
 	if(!$http['loan'] || $http['loan'] <= 0) {
@@ -449,14 +465,16 @@ __Solution:__
 - Vulnerable code:  
 
     ```php
-    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".$http['remark']."', ".$http['amount'].")";
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".$http['remark']."', ".$http['amount'].")";  
+
     $result = mysql_query($sql);
 
     ```
 
 - Fixed code:   
     ```php
-    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";  
+
     $result = mysql_query($sql);
     ```  
 - __Result:__  
