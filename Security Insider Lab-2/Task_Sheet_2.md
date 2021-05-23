@@ -42,9 +42,13 @@ to transfer money from another account to your account.__
 
 
 #### Task 5.
+__5. Enhance your last attack such that it automatically spreads to other accounts and transfers your money from them too. Briefly explain your attack.__
 
 
+<br></br>
+<hr></hr>
 
+<br></br>
 ### Exercise 2: Server-Side Request Forgery(SSRF)
 
 __1. Briefly explain in your own words what is SSRF vulnerability and common SSRF attacks and what are the common SSRF defences circumventing__
@@ -389,15 +393,21 @@ into
 ```php
 preg_replace('#\b'. phpinfo() .'\b#i', '\\0','\0')
 ```
+```php
+$replaceWith =''.phpinfo().'';  //without markup
+```
 
-__2. Disclose the master password for the database your bank application has access
-to. Indicate username, password and DB name as well as the IP address of the
-machine this database is running on.__
+- **Result**
+![Code execution - phpinfo](images/task2/phpinfo.PNG)
 
 
-__4. Assume you are running a server with virtual hosts. Can you disclose the
-password for another bank database and can you access it? Explain which
-potential risk does this vulnerability imply for virtual hosts?__
+__2. Disclose the master password for the database your bank application has access to. Indicate username, password and DB name as well as the IP address of the machine this database is running on.__
+__solution__
+
+
+
+
+__4. Assume you are running a server with virtual hosts. Can you disclose the password for another bank database and can you access it? Explain which potential risk does this vulnerability imply for virtual hosts?__
 __Solution__
 Yes, as the code injection can lead to server takeover, it is possible to view database and passwords of all the bank acounts running on root host.
 Since the settings(`example.conf`) can be modified(Assuming the taken over account has write permissions).
