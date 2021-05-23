@@ -369,15 +369,21 @@ into
 ```php
 preg_replace('#\b'. phpinfo() .'\b#i', '\\0','\0')
 ```
+```php
+$replaceWith =''.phpinfo().'';  //without markup
+```
 
-__2. Disclose the master password for the database your bank application has access
-to. Indicate username, password and DB name as well as the IP address of the
-machine this database is running on.__
+- **Result**
+![Code execution - phpinfo](images/task2/phpinfo.PNG)
 
 
-__4. Assume you are running a server with virtual hosts. Can you disclose the
-password for another bank database and can you access it? Explain which
-potential risk does this vulnerability imply for virtual hosts?__
+__2. Disclose the master password for the database your bank application has access to. Indicate username, password and DB name as well as the IP address of the machine this database is running on.__
+__solution__
+
+
+
+
+__4. Assume you are running a server with virtual hosts. Can you disclose the password for another bank database and can you access it? Explain which potential risk does this vulnerability imply for virtual hosts?__
 __Solution__
 Yes, as the code injection can lead to server takeover, it is possible to view database and passwords of all the bank acounts running on root host.
 Since the settings(`example.conf`) can be modified(Assuming the taken over account has write permissions).
