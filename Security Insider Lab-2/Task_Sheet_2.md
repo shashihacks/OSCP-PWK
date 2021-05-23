@@ -605,8 +605,7 @@ __solution__
 
 
 
-__3. Explain how you can display the php settings of your webserver! Which
-information is relevant for the attacker?__
+__3. Explain how you can display the php settings of your webserver! Which information is relevant for the attacker?__
 __solution__
 
 <!-- Todo -->
