@@ -590,13 +590,18 @@ __solution__
     ```	
 
 
-![database_Details](images/task2/6_2.JPG)
+    ![database_Details](images/task2/6_2.JPG)
 
 
 **Database Details found:**
 
-<!-- Todo Table -->
 
+|  Identifier |  Value |
+|---|---|
+| Database Name  |  vbak |
+| user  |  root |
+| password  |  kakashi |
+|ip| 127.0.0.1|
 
 
 
