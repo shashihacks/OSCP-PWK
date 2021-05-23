@@ -88,9 +88,16 @@ Payload 3
 ```
 Once the payloads are transferred victim can see a ``` Error please click here!!!``` link in the remark field on the Account details page.
 Assuming the victim is innocent and clicks the link.
+
+![Error_Link](images/task2/1.4.png)
+
 The page will be redirected to the error.html which is up and running in the attacker server (Nginx).
 
+![Attacker_Website](images/task2/1.4.1.JPG)
+
 If the victim clicks on the 'proceed' button, the funds will be transferred to the attacker's account, and the page is redirected to the bank web application.
+
+![Attack_Successful](images/task2/1.4.2.JPG)
 
 
 #### Task 5.
@@ -155,6 +162,7 @@ To perfom the attack please repeat the process explained in excercise 1.d replac
 ```
 when the victim clicks the ``` Error please click here!!!``` link the attack will spread to all accounts on the bank server.
 
+![Automated_Attack](images/task2/1.5.JPG)
 <br></br>
 <hr></hr>
 <br></br>
@@ -408,6 +416,7 @@ __Solution:__
 2. set `Http Only` flag to true in both index.php and login.php to avoid cookies being accessed by client side scripts
 ```session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);```
 
+![Cookie_Hijaking_Fix](images/task2/4.5.JPG)
 ### Exercise 5: Session Fixation
 
 __1. Explain the difference to Session Hijacking.__
@@ -440,7 +449,9 @@ __Solution :__
 	```
 
 - User is provided with the link  ```http://localhost:81/bank.html``` which will redired to bank web application.
+ ![Attacker_Website](images/task2/5.1.JPGJPG)
 - when user get redirect the cookie value will be set to ```abcde```.
+ ![Session_Fixation](images/task2/5.1.1.JPG)
 - Follow the same steps provided in Exercise 4 task 2 with a cookie value as ```abcde``. 
 - Attacker can login into victim account.
   
@@ -559,6 +570,7 @@ __solution__ try to look at the folder structure using
 
 Once we know the location of config.php file use the path in cat command ``` '. system("cat ../etc/config.php"); .' ```	 to display the file contents of ```config.php```
 
+![database_Details](images/task2/6_2.JPG)
 __3. Explain how you can display the php settings of your webserver! Which
 information is relevant for the attacker?
 __solution__
