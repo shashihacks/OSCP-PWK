@@ -610,18 +610,23 @@ __solution__
 
 <!-- Todo -->
 - Relevant info:
-- Exposing PHP version can lead to know attacks on that particular version.   
- ![etc_passwd_displaying](images/task2/PHPV.JPG)
- 
-- Access to remote files can lead to attacks like SSRF.
- ![etc_passwd_displaying](images/task2/PHPV1.JPG)
- 
- - Open directory on can lead to remote file inclusion vulnerabilities.
- ![etc_passwd_displaying](images/task2/PHPV2.JPG)
- 
- - Session details are useful to plot attack on user sessions like Session Hijaking or Fixation.
- ![etc_passwd_displaying](images/task2/PHPV3.JPG)
- 
+	- Exposing PHP version can lead to know attacks on that particular version.
+
+	 ![etc_passwd_displaying](images/task2/PHPV.JPG)
+
+
+	- Access to remote files can lead to attacks like SSRF.
+
+	 ![etc_passwd_displaying](images/task2/PHPV1.JPG)
+
+	 - Open directory on can lead to remote file inclusion vulnerabilities.
+
+	 ![etc_passwd_displaying](images/task2/PHPV2.JPG)
+
+	 - Session details are useful to plot attack on user sessions like Session Hijaking or Fixation.
+
+	 ![etc_passwd_displaying](images/task2/PHPV3.JPG)
+
 
 
 __4. Assume you are running a server with virtual hosts. Can you disclose the password for another bank database and can you access it? Explain which potential risk does this vulnerability imply for virtual hosts?__
