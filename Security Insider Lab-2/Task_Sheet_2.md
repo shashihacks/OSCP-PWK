@@ -42,9 +42,13 @@ to transfer money from another account to your account.__
 
 
 #### Task 5.
+__5. Enhance your last attack such that it automatically spreads to other accounts and transfers your money from them too. Briefly explain your attack.__
 
 
+<br></br>
+<hr></hr>
 
+<br></br>
 ### Exercise 2: Server-Side Request Forgery(SSRF)
 
 __1. Briefly explain in your own words what is SSRF vulnerability and common SSRF attacks and what are the common SSRF defences circumventing__
