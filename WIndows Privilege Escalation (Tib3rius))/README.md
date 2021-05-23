@@ -163,14 +163,39 @@ Alternatively, if RDP is available(or enable it), we can add out low privileged 
 net localgroup administrators <username> /add
 ```
 
-### 4.2 Admin -> System
+
+## 5. Privilege Escalation tools
+
+
+### 5.1 Why use Tools
+
+- Tools allw us to automate the reconnaissance that can identify potential privilege escalations.
+- While it is always important to understand what tools are doing, they are valuable in a time-limited setting, such as exam.
+- We will use mostly,  `WinPEAS` and Seatbelt.
+
+### 5.2 Admin -> System
 
 To escalate from and admin user to full SYSTEM privileges, we can uise the `PsExec` tool from Windows Sysinternals
 
 - usage
 ```bash
-.\PsExec64.exe -accepteula -i -s C:\PrivEsc\reverse.exe
+C:\PrivEsc: .\PsExec64.exe -accepteula -i -s C:\PrivEsc\reverse.exe
 ```
+
+
+#### 5.2.1 PowerUp & SharpUp
+
+- PowerUp & SharpUp are very similar tools that hunt for specific privilege escalation misconfigurations.
+- PowerUp: (written using powershell)
+https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1
+- SharpUp: https://github.com/GhostPack/SharpUp
+Pre-Compiled SharpUp: https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/blob/master/SharpUp.exe
+
+
+- Limited Enumeration but good
+
+
+- Running PowerUp
 
 
 <br><br/><br><br/><br><br/><br><br/><br><br/><br><br/>

