@@ -421,12 +421,20 @@ __Solution:__
 ```php
 session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 ```
-**Result** (after login cookie empty?)
+**Result**
+![Cookie_Hijaking_Fix](images/task2/HttpOnly_true.JPG)
+
+- `document.cookie` cant access cookie value.
 ![Cookie_Hijaking_Fix](images/task2/4.5.JPG)
 
 
-<!-- Todo Same origin policy -->
+- Go to `etc/apache2/apache2.conf` file and override `AllowOverride none` to `AllowOverride All`. 
 
+![Cookie_Hijaking_Fix](images/task2/SameOrigin_Apacheconf.JPG)
+
+- Create a .htaccess file in your website directory (/var/www/html) with following lines.
+ 
+![Cookie_Hijaking_Fix](images/task2/SameOrigin_htaccess.JPG)
 
     
 
@@ -550,7 +558,10 @@ __Solution__ Everytime a session has been started regenerate the session id.
 	session_regenerate_id(TRUE); 
 	$_SESSION=array(); // initializing a empty array values the session variable.
 ```
+![Session_fixation_before_login](images/task2/Session_fixation_before.png)
 
+
+![Session_fixation_after_login](images/task2/Session_fixation_after.png)
 
 
 ### Exercise 6: Remote Code Injection
