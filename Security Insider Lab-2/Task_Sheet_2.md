@@ -1,4 +1,4 @@
-Web Application Vulnerabilities -2
+## Web Application Vulnerabilities -2
 
 ### Exercise 1: Cross Site Request Forgery (CSRF/XSRF)
 
@@ -364,6 +364,7 @@ __Solution:__
 
 
 __2. Use the implementation from the last step to hijack the session of a customer of your bank. Briefly describe the steps to perform this attack.__
+
 __solution:__
 
 - Copy the `USECURITYID=b35oqi84j4l16mecckl4lksf60` that is captured on the server log
@@ -405,17 +406,18 @@ session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 
 ### Exercise 5: Session Fixation
 
-__1. Explain the difference to Session Hijacking.__
+__1. Explain the difference to Session Hijacking.__  
 __Solution :__ In Session Fixation, the attacker forces the user to use the session of his choice, wherein  Session Hijacking, the logged-in user session is hijacked.
 
 
-__2. Sketch an attack that allows you to take over the session of a bank user.__
+__2. Sketch an attack that allows you to take over the session of a bank user__
+
 __Solution :__
 - Found two approches in hijacking a session using session fixation.
     1. This approch leverages the phishing attack. A victim is provided with a link and assumption is that he clicks the link.
     2. Manual way, setting the broswer cookie to desired value with key being `USECURITYID` (assuming that attacker has physical access to victim's browser)
 
-**Approach 1**
+**Approach 1** (Victim: `Alex`)
 - create a html file in your server folder with the following script
 	```html
 		<html>
@@ -438,19 +440,19 @@ __Solution :__
 
 - User is provided with the link  `http://localhost:81/bank.html` which will redired to bank web application.
 
- ![Attacker_Website](images/task2/5.1.JPG)
+    ![Attacker_Website](images/task2/5.1.JPG)
 
 - when user get redirect the cookie value will be set to `abcde`.
- ![Session_Fixation](images/task2/5.1.1.JPG).
+    ![Session_Fixation](images/task2/5.1.1.JPG).
 
 - use the cookie value obtained and edit in the browser application and reload the page
-![sesseion_fixation_0](images/task2/sesseion_fixation_0.PNG)
+    ![sesseion_fixation_0](images/task2/sesseion_fixation_0.PNG)
 
 - Attacker will now login into victim account.
-
-![hijack_after_fixation](images/task2/hijack_after_fixation.PNG)
+- **Result**
+    ![hijack_after_fixation_as_attacker](images/task2/hijack_after_fixation_as_attacker.PNG)
   
-**Approach 2: Manual Approach**
+**Approach 2: Manual Approach** (Victim: `Bob`)
 - **step 1**: Open `EditThiCookie` extension and click on import.
 - **step 2:** Use the following payload to set the cookie value
 ```javascript
