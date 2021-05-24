@@ -400,7 +400,23 @@ __5. Implement some precautions which can prevent or mitigate this attack?__
 
 __Solution:__  
 1. Sanitize user input to avoid any injection into the application.
-2. set `Http Only` flag to true in both index.php and login.php(where session is being set) to avoid cookies being accessed by client side scripts.
+- Vulnerable code:  
+
+    ```php
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".$http['remark']."', ".$http['amount'].")";  
+
+    $result = mysql_query($sql);
+
+    ```
+
+- Fixed code:   
+    ```php
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";  
+
+    $result = mysql_query($sql);
+    ```
+    ![XSS](images/task2/4_XSS.JPG)
+3. set `Http Only` flag to true in both index.php and login.php(where session is being set) to avoid cookies being accessed by client side scripts.
  
 ```php
 session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
@@ -410,7 +426,9 @@ session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 
 
 <!-- Todo Same origin policy -->
-<!-- Todo Fix XSS -->
+
+
+    
 
 
 ### Exercise 5: Session Fixation
