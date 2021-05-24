@@ -338,8 +338,8 @@ __Solution:__
     $ python3 -m http.server
         Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/)
 ```  
-- Initiate multiple funds transfer with following remarks,
-> Multiple transfers are required as the remarks input is limited to 100 characters after encoding the contnets in it. For that reason, **payload is staged**.
+- Initiate  funds transfer with following remarks,
+
 - Remarks in transfer 1:
 
 ```javascript
@@ -409,12 +409,16 @@ __Solution:__
 
     ```
 
-- Fixed code:   
+- Fixed code:  
+
     ```php
     $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";  
 
     $result = mysql_query($sql);
     ```
+
+- **Result:**
+
     ![XSS](images/task2/4_XSS.JPG)
 2. set `Http Only` flag to true in both index.php and login.php(where session is being set) to avoid cookies being accessed by client side scripts.
  
@@ -422,9 +426,11 @@ __Solution:__
 session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 ```
 **Result**
+
 ![Cookie_Hijaking_Fix](images/task2/HttpOnly_true.JPG)
 
 - `document.cookie` cant access cookie value.
+
 ![Cookie_Hijaking_Fix](images/task2/4.5.JPG)
 
 
@@ -432,7 +438,7 @@ session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 
 ![Cookie_Hijaking_Fix](images/task2/SameOrigin_Apacheconf.JPG)
 
-- Create a .htaccess file in your website directory (/var/www/html) with following lines.
+- Create a .htaccess(if unavailable) file in your website directory (/var/www/html) with following lines.
  
 ![Cookie_Hijaking_Fix](images/task2/SameOrigin_htaccess.JPG)
 
@@ -478,13 +484,16 @@ __Solution :__
     ![Attacker_Website](images/task2/5.1.JPG)
 
 - When user get redirect the cookie value will be set to `abcde`.
+
     ![Session_Fixation](images/task2/5.1.1.JPG).
 
 - Use the cookie value obtained and edit in the browser application and reload the page.
+
     ![sesseion_fixation_0](images/task2/sesseion_fixation_0.PNG)
 
 - Attacker will now login into victim account.
 - **Result**
+
     ![hijack_after_fixation_as_attacker](images/task2/hijack_after_fixation_as_attacker.PNG)
   
 **Approach 2: Manual Approach** (Victim: `Bob`)
@@ -512,6 +521,7 @@ __Solution :__
  
 -  Allow the user to log in.
 ***Before Log in***
+
 ![fixation_before_login](images/task2/fixation_before_login.PNG)
 
 ***After Log in*** Same cookie value exists.
@@ -614,7 +624,6 @@ __solution__
 ```php
  '. system("pwd"); .' 
 ``` 
-<!-- Todo Images -->
 
 ```php
  '. system("ls"); .' 
@@ -650,7 +659,7 @@ __solution__
 __3. Explain how you can display the php settings of your webserver! Which information is relevant for the attacker?__
 __solution__
 
-<!-- Todo -->
+
 - Relevant info:
 	- Exposing PHP version can lead to know attacks on that particular version.
 
