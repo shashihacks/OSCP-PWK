@@ -397,7 +397,8 @@ __Solution:__ `HTTPS` has no significant influence in this case, as the attacker
  If cookies are sent in headers `secure` flag should be set, indicate to the browser that cookies can only be sent in `HTTPS` requests.
 
 __5. Implement some precautions which can prevent or mitigate this attack?__
-__Solution:__
+
+__Solution:__  
 1. Sanitize user input to avoid any injection into the application.
 2. set `Http Only` flag to true in both index.php and login.php(where session is being set) to avoid cookies being accessed by client side scripts.
  
@@ -410,6 +411,7 @@ session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 
 <!-- Todo Same origin policy -->
 <!-- Todo Fix XSS -->
+
 
 ### Exercise 5: Session Fixation
 
