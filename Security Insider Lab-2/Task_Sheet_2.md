@@ -609,7 +609,7 @@ __solution__
 
 |  Identifier |  Value |
 |---|---|
-| Database Name  |  vbak |
+| Database Name  |  vbank |
 | user  |  root |
 | password  |  kakashi |
 |ip| 127.0.0.1|
