@@ -558,10 +558,12 @@ __Solution__ Everytime a session has been started regenerate the session id.
 	session_regenerate_id(TRUE); 
 	$_SESSION=array(); // initializing a empty array values the session variable.
 ```
-![Session_fixation_before_login](images/task2/Session_fixation_before.png)
+![Session_fixation_before](images/task2/Session_fixation_before.JPG)
 
 
-![Session_fixation_after_login](images/task2/Session_fixation_after.png)
+
+
+![Session_fixation_after](images/task2/Session_fixation_after.JPG)
 
 
 ### Exercise 6: Remote Code Injection
