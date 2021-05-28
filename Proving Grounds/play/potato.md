@@ -287,17 +287,28 @@ drwxr-xr-x 21 root root 4096 Sep 28  2020 ..
 ```bash
 echo "/bin/bash" >> root.sh
 ```
+
+
 - change poermissions to execute `chmod +x shell.sh`
 - ran the application using `/bin/nice` binary as `sudo` and logegd is as `root`
 ![root](potato_images/root.PNG)
 
-
+> 
+```bash
+$: sudo /bin/nice root.sh // did'nt work probably the file directory also need to run as sudo
+```
 __Takeaway:__
 
 0. Always scan for all ports
 1. Scan for directories through `gobuster` always
-2. Type jugglin in php can be manipulated in many ways
 3. use `gtf0bins` for absuing binaries
+
+
+__Vulnerabilitie/Attacks__
+
+1. Directory traversal attacks
+2. PHP type juggling
+3. Weak passwords/hashes
 
 
 
