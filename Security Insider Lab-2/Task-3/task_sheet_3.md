@@ -163,3 +163,29 @@ Table: users
 [*] ending @ 06:38:00 /2021-05-24/
 
 ```
+
+
+True positives
+SQl injection
+XSS(reflected and stored)
+CSRF
+Code execution
+
+
+
+
+false positives:
+XSS - given payloads didn;t work
+
+Findings- Scanners (Acunetix, owasp zap, nikto)
+Clickjacking
+Browsable directories
+Server information in headers
+HTtp only flag not set
+X-XSS protection is not set
+      X-XSS-Protection is a HTTP header understood by Internet Explorer 8 (and newer versions). This header lets domains toggle on and off the "XSS Filter"
+
+
+
+Sqlmap
+detected sql injection and able to dump
