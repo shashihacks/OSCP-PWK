@@ -7,9 +7,9 @@ Rating: **Easy**
 
  **Nmap Output:** 
 ```bash
-kali@kali:~$ nmap -sC -sV -oA nmap/initial 192.168.60.101
+kali@kali:~$ nmap -sC -sV -oA nmap/initial 192.168.54.101
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-05-27 16:51 EDT
-Nmap scan report for 192.168.60.101
+Nmap scan report for 192.168.54.101
 Host is up (0.00015s latency).
 Not shown: 998 closed ports
 PORT   STATE SERVICE VERSION
@@ -295,7 +295,7 @@ echo "/bin/bash" >> root.sh
 
 > 
 ```bash
-$: sudo /bin/nice root.sh // did'nt work probably the file directory also need to run as sudo
+$: sudo /bin/nice root.sh # did'nt work probably the file directory also need to run as sudo
 ```
 __Takeaway:__
 
