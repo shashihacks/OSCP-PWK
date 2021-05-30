@@ -1,6 +1,39 @@
-step 1:
+### Exercise 2: Black-Box Web Application Vulnerability Testing
 
 
+
+
+__1. Download two web vulnerability scanners and describe the all needed set-up environment
+settings__
+__solution :__
+1. Owasp Zed Attack Proxy (Linux) (Avaialble in `kali Linux`)
+   - Download the program from https://www.zaproxy.org/download/ , and select the Linux installer
+   - run the file `./ZAP_2_10_0_unix.sh`
+   - after successfull installation run the file from command line `$: zapproxy`
+   - An gui app will be opened if ran without errors.
+   
+![zap_interface](../task3/images/zap_interface.PNG)
+
+
+2. Nikto Vulnerabuility Scanner
+- A command line web vulnerability scanner
+
+```bash
+git clone https://github.com/sullo/nikto
+# Main script is in program/
+cd nikto/program
+# Run using the shebang interpreter
+./nikto.pl -h http://www.vbank.com
+# Run using perl (if you forget to chmod)
+perl nikto.pl -h http://www.vbank.com
+
+# to use the proxy
+perl nikto.pl -h http://www.vbank.com -useproxy
+```
+  - Avialble by Default in Kali installation
+  - Run the application `nikto -h http://vbank.com`
+
+![nikto_sample_usage](../task3/images/nikto_sample.PNG)
 
 Step 2- Dump the databse obtained from the previous step
 
