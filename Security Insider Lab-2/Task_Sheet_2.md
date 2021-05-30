@@ -336,8 +336,6 @@ __2. How do you identify and exploit LFI? Describe it with a simple example.__
 
 
 
-
-
 __3. Briefly explain what is Remote File Inclusion (RFI) and how can you minimise the risk of RFI attacks? And LFI vs. RFI?__  
 __Solution:__  
 - **Remote File Inclusion (RFI)** web vulnerability where arbitary input is allowed in file include request that dynamically refere external scripts.
