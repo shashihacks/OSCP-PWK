@@ -1,3 +1,72 @@
+### Exercise 1: White Box Web Application Vulnerability Testing
+__1. Apply your chosen scanner on the unpatched version of the source code of your webapplication. Identify the vulnerabilities which were not found by the tool and briefly explain why the tool was unable to find them (try to condense your answer to particular classes of vulnerabilities).__
+__solution :__
+
+**Chosen scanners:** 
+   - RIPS
+   - OWASP ASST
+
+**Installation:**
+   - **RIPS:**
+      - Extract the files to your local web server's document root (in my case /var/www/html/).
+      - To run the tool open browser at http://localhost/rips-master.
+      
+      Insert Image
+      - Give location to the code for testing in Path/file field. 
+      - Select Verbosity level : 4.
+      - Vuln type: can select all or a particular vulnarability and hit scan.
+      
+      Insert Image
+      
+   - **OWASP ASST:**
+      -  Install Xampp the same version used for project (php-5)
+      -  Put your file in Xampp folder  “/opt/lampp/htdocs/vbank”. 
+      -  Install Node.js.
+      
+        ```bash
+          sudo apt-get install nodejs -y
+          sudo apt-get install npm -y
+          sudo npm install n -g
+          sudo n 12.13.0
+        ```    
+      - Put the code of ASST in the same folder.
+      - Insert Image
+      
+        ```bash
+            sudo /opt/lampp/lampp start start xampp
+           ```
+
+
+#### Vulnerabilities found (Test from both RIPS and ASST)           
+| Vulnerability type | RIPS | OWASP ASST |                     
+| --- | --- | --- | 
+| SQL Injection | 17 | 21 |
+| Cross site scripting | 95 | 2 |
+| Cross-Site Request Forgery | 0 | 6 |
+| Server-side request forgery | 0 | 0 |
+| Local file inclusion | 5 | 0 |
+| Broken Authenticationg | 0 | 6 |
+| Session Hijacking | 0 | 0 |
+| Session Fixation | 1 | 0 |
+| Remote code Injection | 1 | 0 |
+| Sensitive Data Exposure | 0 | 7 |
+| Known Vulnerabilities | 0 | 2 |
+
+
+why?
+
+
+
+__2. Run the analysis again using the patched version of the source code of your web-application.
+Check whether the vulnerabilities found before are still reported or not.__
+__solution :__
+
+
+#### Vulnerabilities found (Test from both RIPS and ASST)         
+| Vulnerability type | location | security patch | test case | Result|                    
+| --- | --- | --- | --- | --- |
+
+
 ### Exercise 2: Black-Box Web Application Vulnerability Testing
 
 
