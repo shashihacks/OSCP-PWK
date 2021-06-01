@@ -225,7 +225,8 @@ perl nikto.pl -h http://www.vbank.com -useproxy
 
 
 
-__2. Report how you found the different vulnerabilities: SQLi, XSS, etc.__
+__2. Report how you found the different vulnerabilities: SQLi, XSS, etc.__  
+
 __solution__
 1. Nikto Vulnerability Scanner
    - Run the nikto from command line with `--host` switch for host url
@@ -245,11 +246,12 @@ __solution__
 -  run the zapproxy `zapproxy` and click on the `automated scan`
 ![zed attack proxy](../task3/images/zap_intro.png)
 <br>
-- Results
 
 
 
-**ZAP Scanning Report**
+
+
+**ZAP Scanning Report- Results**
 
 **Summary of Alerts**
 
