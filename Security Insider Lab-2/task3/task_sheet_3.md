@@ -191,7 +191,7 @@ __solution :__
 ![ASST_CSRF](../task3/images/ASST_CSRF.JPG)
 ![ASST_CSRF_FIX](../task3/images/ASST_CSRF_FIX.JPG)
 
-
+Even after fixing the code with a security patch, there are a lot of false positives because the tool is not sure of the integrity and security of data flow from input to output.
 
 ### Exercise 2: Black-Box Web Application Vulnerability Testing
 
