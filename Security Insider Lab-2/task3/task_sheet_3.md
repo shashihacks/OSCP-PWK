@@ -23,34 +23,34 @@ __Solution :__
       -  Install Node.js.
       
       ```bash
-           sudo apt-get install nodejs -y
-           sudo apt-get install npm -y
-           sudo npm install n -g
-           sudo n 12.13.0
+         sudo apt-get install nodejs -y
+         sudo apt-get install npm -y
+         sudo npm install n -g
+         sudo n 12.13.0
         ```    
       - Put the code of [ASST](https://github.com/OWASP/ASST) in the same folder `/opt/lampp/htdocs/ASST`.
       - Change `DEFAULT_PROJECT_PATH_TO_SCAN` in `config.js` to following.
       ```script
-          DEFAULT_PROJECT_PATH_TO_SCAN: "/var/www/vbank_code/", // Path to project to test
+         DEFAULT_PROJECT_PATH_TO_SCAN: "/var/www/vbank_code/", // Path to project to test
       ```
      - Change following fields in `config_php_lang.js` to following.   
      
      ```script
-         PHP_EXE_BIN_PATH: "/usr/bin/php", 
-         IS_DBMS_USED: true,
-         DBMS: "mysql",
-         // if above IS_DBMS_USED = true, bellow settings are enabled and must be set
-         YOUR_WEBAPP_DBMS_SERVER_IP: "127.0.0.1", 
-         YOUR_WEBAPP_DBMS_DB_NAME: "vbank",
-         YOUR_WEBAPP_DBMS_USERNAME: "root",
-         YOUR_WEBAPP_DBMS_PASSWORD: "kakashi",
+      PHP_EXE_BIN_PATH: "/usr/bin/php", 
+      IS_DBMS_USED: true,
+      DBMS: "mysql",
+      // if above IS_DBMS_USED = true, bellow settings are enabled and must be set
+      YOUR_WEBAPP_DBMS_SERVER_IP: "127.0.0.1", 
+      YOUR_WEBAPP_DBMS_DB_NAME: "vbank",
+      YOUR_WEBAPP_DBMS_USERNAME: "root",
+      YOUR_WEBAPP_DBMS_PASSWORD: "kakashi",
      ```
      ```bash
-         sudo /opt/lampp/lampp start xampp
-         cd /opt/lampp/htdocs/ASST
-         node main.js
+      sudo /opt/lampp/lampp start xampp
+      cd /opt/lampp/htdocs/ASST
+      node main.js
      ```
-   ![ASST_SCAN](../task3/images/ASST_SCAN.JPG)
+      ![ASST_SCAN](../task3/images/ASST_SCAN.JPG)
 
 #### Vulnerabilities found (Test from both RIPS and ASST)           
 | Vulnerability type | RIPS | OWASP ASST |                     
