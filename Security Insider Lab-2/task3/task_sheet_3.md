@@ -80,12 +80,12 @@ __solution :__
 | Vulnerability type | location | security patch | Test case | Result|
 | --- | --- | --- | --- | --- | 
 | SQL Injection | /vbank_code/pages/htbloanreq.page line 30 | mysql_real_escape_string | --- | POSITIVE |
-| File Inclusion  | vbank_code/etc/htb.inc line 24 | --- | --- | FALSE POSITIVE |
+| File Inclusion  | vbank_code/etc/htb.inc line 24 | --- | There are no `include_once()` methods accepting user input  | FALSE POSITIVE |
 | Code Execution | vbank_code/pages/htbdetails.page line 95 | Whitelisting | --- | POSITIVE |
-| Cross-Site Scripting | /vbank_code/pages/htbdetails.page line 85,102 | htmlspecialchars | --- | POSITIVE |
-| Session Fixation | /vbank_code/etc/htb.inc line 53 | --- | --- | FALSE POSITIVE |
-| HTTP Response Splitting | vbank_code/etc/htb.inc line 27 | --- | --- | FALSE POSITIVE |
-| Reflection Injection | vbank_code/htdocs/index.php line 21 | --- | --- | FALSE POSITIVE |
+| Cross-Site Scripting | /vbank_code/pages/htbdetails.page line 85,102 | htmlspecialchars | --- | FALSE NEGAt;IVE |
+| Session Fixation | /vbank_code/etc/htb.inc line 53 | --- | There is no `setcookie` method accepting user input | FALSE POSITIVE |
+| HTTP Response Splitting | vbank_code/etc/htb.inc line 27 | --- | The `URL` used in `header` method already have a security check | FALSE POSITIVE |
+| Reflection Injection | vbank_code/htdocs/index.php line 21 | --- | `ob_start()` is not accepting user input | FALSE POSITIVE |
 
 - Red dot indicate there is an User-implemented security patch. 
 ![RIPS_ICONS](../task3/images/RIPS_ICONS.JPG)
@@ -96,20 +96,19 @@ __solution :__
    ![RIPS_SQLI](../task3/images/RIPS_SQLI.JPG)
    - Variables (passed from other PHP classes or an user input) used in `mysql_query` are protected using `mysql_real_escape_string`.
    ![RIPS_SQLI_FIX](../task3/images/RIPS_SQLI_FIX.JPG) 
- - **File Inclusion**
-   - All vulnarabilties detected are False Positive. There are no `include_once()` methods using user input data.
- - **Code Execution**
+- **Code Execution**
    - Vulnarable code
    ```php
    $replaceWith =  preg_replace('#\b". str_replace('\\', '\\\\', ". $http['query'] ."\b#i', '<span class=\"queryHighlight\">\\\\0</span>','\\0');
    ``` 
+   ![RIPS_CODE_EXE](../task3/images/RIPS_CODE_EXE.JPG)
    - Patch 
    ``` php
       $whitelists  = ['system','phpinfo']	;			
                      $string = $http['query'];
                      foreach ($whitelists as $whitelist) {
                          if (strpos($string, $whitelist) !== FALSE) {
-                              $replaceWith =  "preg_replace('#\b". str_replace('\\', '\\\\', 'please') ."\b#i', '<span class=\"queryHighlight\">\\\\0</span>','\\0')";
+                              $replaceWith =  "preg_replace('#\b". str_replace('\\', '\\\\', 'phpinfoReplaces') ."\b#i', '<span class=\"queryHighlight\">\\\\0</span>','\\0')";
                               break;
                          }else{
                               //echo "kakashi";
@@ -117,16 +116,67 @@ __solution :__
                             }
                         }
     ```
+   
+   ![RIPS_CODE_EXE_FIX](../task3/images/RIPS_CODE_EXE_FIX.JPG)
+   
+   ![RIPS_CODE_EXE_TESTCASE](../task3/images/RIPS_CODE_EXE_TESTCASE.JPG)
+   ![RIPS_CODE_EXE_TESTCASE2](../task3/images/RIPS_CODE_EXE_TESTCASE2.JPG)
+  
+- **Cross Site Scripting:**
+   - Use `htmlspecialchars` to display data.
+   - `transfersStr` is a string containing html table in it so `htmlspecialchars` cant be used. 
+   - We can apply the `htmlspecialchars` to Rowdata used in transfersStr. This resulted in false negative but it is no longer vulnerable to XSS. 
+  ![RIPS_XSS](../task3/images/RIPS_XSS.JPG)
+  ![RIPS_XSS_FIX](../task3/images/RIPS_XSS_FIX.JPG)
+  ![RIPS_XSS_TESTCASE](../task3/images/RIPS_XSS_TESTCASE.JPG)
+  
 
 #### Vulnerabilities Fix (Test ASST)         
 | Vulnerability type | location | security patch | Test | Test case | Result|
 | --- | --- | --- | --- | --- |  --- | 
 | SQL Injection | /vbank_code/htdocs/login.php line 17 | Preparedstatements | ASST | --- | POSITIVE |
-| Cross site scripting | /vbank_code/htdocs/login.php line 14,15 | htmlentities and htmlspecialchars | ASST | --- | POSITIVE |
+| Cross Site Scripting | /vbank_code/htdocs/login.php line 14,15 | htmlentities and htmlspecialchars | ASST | --- | POSITIVE |
 | Cross-Site Request Forgery  | vbank_code/pages/htbchgpwd.php | CSRF Token | ASST | --- | POSITIVE |
 | Sensitive Data Exposure Vulnerabilities | Passwords are not stored in Hash | HASH the password | ASST | --- | --- |
 | Using Components With Known Vulnerabilities | PHP Version is 5.6 | Use new versions of PHP | ASST | --- | --- |
 | Broken Authentication Vulnerabilities  | /vbank_code/pages/htbchgpwd.php | Implement Google reCaptcha | ASST | --- | --- |
+
+**Test Cases:**
+- **SQL Injection**
+     - Prepared statement
+     
+        ```
+        if ($stmt = $link->prepare("SELECT id,password,username,name,firstname,time,lasttime,lastip from users where username =? and password=?")) {   
+               $stmt->bind_param("ss", $username,$password);
+               $stmt -> execute();
+               $stmt -> store_result();
+               $stmt -> bind_result($id,$password,$username,$name,$firstname,$time,$lasttime,$lastip);
+         }
+         ```
+ ![ASST_SQLI](../task3/images/ASST_SQLI.JPG)
+ ![ASST_SQLI_FIX](../task3/images/ASST_SQLI_FIX.JPG)
+ ![ASST_SQLI_TESTCASE](../task3/images/ASST_SQLI_TESTCASE.JPG)
+- **Cross Site Scripting**
+   - Vulnarable code
+   ```$username = $_REQUEST['username'];
+      $password = $_REQUEST['password'];
+   ```
+   - Security patch
+   ```$username = htmlentities(htmlspecialchars($_REQUEST['username']);
+      $password = htmlentities(htmlspecialchars($_REQUEST['password']);
+   ```
+
+![ASST_XSS](../task3/images/ASST_XSS.JPG)
+![ASST_XSS_FIX](../task3/images/ASST_XSS_FIX.JPG)
+- **Cross-Site Request Forgery**
+- Patch
+```        
+   <input type="hidden" name="csrf_token" value="csrftoken" />
+```
+   - use the same token value on server side to validate.
+
+![ASST_CSRF](../task3/images/ASST_CSRF.JPG)
+![ASST_CSRF_FIX](../task3/images/ASST_CSRF_FIX.JPG)
 
 
 
