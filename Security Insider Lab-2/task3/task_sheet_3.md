@@ -87,15 +87,15 @@ Check whether the vulnerabilities found before are still reported or not.__
 __solution :__
 
 #### Vulnerabilities Fix (Test RIPS)         
-| Vulnerability type      | location                                      | security patch           | Test case                                                       | Result          |
-| ----------------------- | --------------------------------------------- | ------------------------ | --------------------------------------------------------------- | --------------- |
-| SQL Injection           | /vbank_code/pages/htbloanreq.page line 30     | mysql_real_escape_string | ---                                                             | POSITIVE        |
-| File Inclusion          | vbank_code/etc/htb.inc line 24                | ---                      | There are no `include_once()` methods accepting user input      | FALSE POSITIVE  |
-| Code Execution          | vbank_code/pages/htbdetails.page line 95      | Whitelisting             | ---                                                             | POSITIVE        |
+| Vulnerability type      | location                                      | security patch           | Test case                                                       | Result         |
+| ----------------------- | --------------------------------------------- | ------------------------ | --------------------------------------------------------------- | -------------- |
+| SQL Injection           | /vbank_code/pages/htbloanreq.page line 30     | mysql_real_escape_string | ---                                                             | POSITIVE       |
+| File Inclusion          | vbank_code/etc/htb.inc line 24                | ---                      | There are no `include_once()` methods accepting user input      | FALSE POSITIVE |
+| Code Execution          | vbank_code/pages/htbdetails.page line 95      | Apply security check     | ---                                                             | FALSE POSITIVE |
 | Cross-Site Scripting    | /vbank_code/pages/htbdetails.page line 85,102 | htmlspecialchars         | ---                                                             | FALSE POSITIVE |
-| Session Fixation        | /vbank_code/etc/htb.inc line 53               | ---                      | There is no `setcookie` method accepting user input             | POSITIVE  |
-| HTTP Response Splitting | vbank_code/etc/htb.inc line 27                | ---                      | The `URL` used in `header` method already have a security check | FALSE POSITIVE  |
-| Reflection Injection    | vbank_code/htdocs/index.php line 21           | ---                      | `ob_start()` is not accepting user input                        | FALSE POSITIVE  |
+| Session Fixation        | /vbank_code/etc/htb.inc line 53               | ---                      | There is no `setcookie` method accepting user input             | FALSE POSITIVE |
+| HTTP Response Splitting | vbank_code/etc/htb.inc line 27                | ---                      | The `URL` used in `header` method already have a security check | FALSE POSITIVE |
+| Reflection Injection    | vbank_code/htdocs/index.php line 21           | ---                      | `ob_start()` is not accepting user input                        | FALSE POSITIVE |
 
 - Red dot indicate there is an user-implemented security patch. 
 ![RIPS_ICONS](../task3/images/RIPS_ICONS.JPG)
@@ -109,31 +109,19 @@ __solution :__
 - **Code Execution**
    - Vulnarable code
    ```php
-   $replaceWith =  preg_replace('#\b". str_replace('\\', '\\\\', ". $http['query'] ."\b#i', '<span class=\"queryHighlight\">\\\\0</span>','\\0');
+  if(isset($http['query']) && $http['query'] != "") {
+		$replaceWith =  preg_replace('#\b". str_replace('\\', '\\\\', ". $http['query'] ."\b#i', '<span class=\"queryHighlight\">\\\\0</span>','\\0');
    ``` 
    ![RIPS_CODE_EXE](../task3/images/RIPS_CODE_EXE.JPG)
    <br/>
    - Security patch 
-<!--    - TODO: htmlspecialchars($http['query'])  -->
 
-   ``` php
-      $whitelists  = ['system','phpinfo']	;			
-                     $string = $http['query'];
-                     foreach ($whitelists as $whitelist) {
-                         if (strpos($string, $whitelist) !== FALSE) {
-                              $replaceWith =  "preg_replace('#\b". str_replace('\\', '\\\\', 'phpinfoReplaces') ."\b#i', '<span class=\"queryHighlight\">\\\\0</span>','\\0')";
-                              break;
-                         }else{
-                              //echo "kakashi";
-                              $replaceWith =  "preg_replace('#\b". str_replace('\\', '\\\\',$string) ."\b#i', '<span class=\"queryHighlight\">\\\\0</span>','\\0')";
-                            }
-                        }
-    ```
-   
-   ![RIPS_CODE_EXE_FIX](../task3/images/RIPS_CODE_EXE_FIX.JPG)
-   
-   ![RIPS_CODE_EXE_TESTCASE](../task3/images/RIPS_CODE_EXE_TESTCASE.JPG)
-   ![RIPS_CODE_EXE_TESTCASE2](../task3/images/RIPS_CODE_EXE_TESTCASE2.JPG)
+   ```php
+   if(isset($http['query']) && $http['query'] != "" && preg_match('/^[a-zA-Z\d]+$/', $http['query'])) {
+   ```
+   - Despite applying the patch (Applying check to user input) tool still shows the vulnerability because the rule is to not have any user input data in functions this is a false positive.
+  
+   ![RIPS_CODE_EXE](../task3/images/RIPS_CODE_EXE.JPG)
   
 - **Cross Site Scripting:**
    - Use `htmlspecialchars` to display data.
@@ -156,16 +144,15 @@ __solution :__
 
 **Test Cases:**
 - **SQL Injection**
-     - Prepared statement
-     
-        ```
-        if ($stmt = $link->prepare("SELECT id,password,username,name,firstname,time,lasttime,lastip from users where username =? and password=?")) {   
-               $stmt->bind_param("ss", $username,$password);
-               $stmt -> execute();
-               $stmt -> store_result();
-               $stmt -> bind_result($id,$password,$username,$name,$firstname,$time,$lasttime,$lastip);
-         }
-         ```
+  - Prepared statement
+   ```php
+      if ($stmt = $link->prepare("SELECT id,password,username,name,firstname,time,lasttime,lastip from users where username =? and password=?")) {   
+         $stmt->bind_param("ss", $username,$password);
+         $stmt -> execute();
+         $stmt -> store_result();
+         $stmt -> bind_result($id,$password,$username,$name,$firstname,$time,$lasttime,$lastip);
+      }
+   ```
  ![ASST_SQLI](../task3/images/ASST_SQLI.JPG)
  ![ASST_SQLI_FIX](../task3/images/ASST_SQLI_FIX.JPG)
  ![ASST_SQLI_TESTCASE](../task3/images/ASST_SQLI_TESTCASE.JPG)
@@ -187,11 +174,12 @@ __solution :__
     <input type="hidden" name="csrf_token" value="csrftoken" />
    ```
    - Use the same token value on the server side to validate.
+   - on top of this Use Built-In Or Existing CSRF Implementations for CSRF Protection
 
 ![ASST_CSRF](../task3/images/ASST_CSRF.JPG)
 ![ASST_CSRF_FIX](../task3/images/ASST_CSRF_FIX.JPG)
 
-
+Even after fixing the code with a security patch, there are a lot of false positives because the tool is not sure of the integrity and security of data flow from input to output.
 
 ### Exercise 2: Black-Box Web Application Vulnerability Testing
 
