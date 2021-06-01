@@ -76,7 +76,7 @@ __1.1 Why the tool was unable to find them?__
 - Tool didn't find vulnerabilities such as Authentication problems, Access Control issues, insecure use of Cryptography.
   - This is due to a lack of compilation instructions, access to remote APIs inability to find the right libraries.
 - RIPS didn't find CSRF AND SSRF because it was not included in rules whereas ASST detected CSRF because it has rules defined for CSRF vulnerabilities.
-
+- CSRF and SSRF required manual manipulation of URL which is hard for automated tool to take care of.
 
 
 
@@ -87,15 +87,15 @@ Check whether the vulnerabilities found before are still reported or not.__
 __solution :__
 
 #### Vulnerabilities Fix (Test RIPS)         
-| Vulnerability type      | location                                      | security patch           | Test case                                                       | Result         |
-| ----------------------- | --------------------------------------------- | ------------------------ | --------------------------------------------------------------- | -------------- |
-| SQL Injection           | /vbank_code/pages/htbloanreq.page line 30     | mysql_real_escape_string | ---                                                             | POSITIVE       |
-| File Inclusion          | vbank_code/etc/htb.inc line 24                | ---                      | There are no `include_once()` methods accepting user input      | FALSE POSITIVE |
-| Code Execution          | vbank_code/pages/htbdetails.page line 95      | Apply security check     | ---                                                             | FALSE POSITIVE |
-| Cross-Site Scripting    | /vbank_code/pages/htbdetails.page line 85,102 | htmlspecialchars         | ---                                                             | FALSE POSITIVE |
-| Session Fixation        | /vbank_code/etc/htb.inc line 53               | ---                      | There is no `setcookie` method accepting user input             | FALSE POSITIVE |
-| HTTP Response Splitting | vbank_code/etc/htb.inc line 27                | ---                      | The `URL` used in `header` method already have a security check | FALSE POSITIVE |
-| Reflection Injection    | vbank_code/htdocs/index.php line 21           | ---                      | `ob_start()` is not accepting user input                        | FALSE POSITIVE |
+| Vulnerability type      | location                                      | security patch                        | Test case                                                                        | Result         |
+| ----------------------- | --------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------- | -------------- |
+| SQL Injection           | /vbank_code/pages/htbloanreq.page line 30     | mysql_real_escape_string()            | ---                                                                              | POSITIVE       |
+| File Inclusion          | vbank_code/etc/htb.inc line 24                | ---                                   | There are no `include_once()` methods accepting user input                       | POSITIVE       |
+| Code Execution          | vbank_code/pages/htbdetails.page line 95      | `preg_match('/^[a-zA-Z\d]+$/', $str)` | '.phpinfo().'                                                                    | POSITIVE       |
+| Cross-Site Scripting    | /vbank_code/pages/htbdetails.page line 85,102 | htmlspecialchars                      | `<script>alert(1)</script>`                                                      | POSITIVE       |
+| Session Fixation        | /vbank_code/etc/htb.inc line 53               | session_regenerate_id(true)           | session_regenerate_id(true)  There is no `setcookie` method accepting user input | POSITIVE       |
+| HTTP Response Splitting | vbank_code/etc/htb.inc line 27                | ---                                   | The `URL` used in `header` method already have a security check                  | FALSE POSITIVE |
+| Reflection Injection    | vbank_code/htdocs/index.php line 21           | ---                                   | `ob_start()` is not accepting user input                                         | FALSE POSITIVE |
 
 - Red dot indicate there is an user-implemented security patch. 
 ![RIPS_ICONS](../task3/images/RIPS_ICONS.JPG)
@@ -123,6 +123,7 @@ __solution :__
   
    ![RIPS_CODE_EXE](../task3/images/RIPS_CODE_EXE.JPG)
   
+  - 
 - **Cross Site Scripting:**
    - Use `htmlspecialchars` to display data.
    - `transfersStr` is a string containing HTML table in it so `htmlspecialchars` cant be used. 
@@ -140,7 +141,7 @@ __solution :__
 | Cross-Site Request Forgery                  | vbank_code/pages/htbchgpwd.php          | CSRF Token                        | ASST | ---       | POSITIVE |
 | Sensitive Data Exposure Vulnerabilities     | Passwords are not stored in Hash        | HASH the password                 | ASST | ---       | ---      |
 | Using Components With Known Vulnerabilities | PHP Version is 5.6                      | Use new versions of PHP           | ASST | ---       | ---      |
-| Broken Authentication Vulnerabilities       | /vbank_code/pages/htbchgpwd.php         | Implement Google reCaptcha        | ASST | ---       | ---      |
+| Broken Authentication Vulnerabilities       | /vbank_code/pages/htbchgpwd.php         | **captcha**                       | ASST | ---       | ---      |
 
 **Test Cases:**
 - **SQL Injection**
@@ -174,12 +175,13 @@ __solution :__
     <input type="hidden" name="csrf_token" value="csrftoken" />
    ```
    - Use the same token value on the server side to validate.
-   - on top of this Use Built-In Or Existing CSRF Implementations for CSRF Protection
+   - Additionally implement Same origin policy or send csrf token in as part of headers.
 
 ![ASST_CSRF](../task3/images/ASST_CSRF.JPG)
 ![ASST_CSRF_FIX](../task3/images/ASST_CSRF_FIX.JPG)
 
-Even after fixing the code with a security patch, there are a lot of false positives because the tool is not sure of the integrity and security of data flow from input to output.
+
+- Even after fixing the code with a security patch, there are a lot of false positives because the tool is not sure of the integrity and security of data flow from input to output.
 
 
 
@@ -255,38 +257,38 @@ __solution__
 
 **Summary of Alerts**
 
-| Risk Level | Number of Alerts |
-| --- | --- |
-| High | 1 |
-| Medium | 1 |
-| Low | 4 |
-| Informational | 2 |
+| Risk Level    | Number of Alerts |
+| ------------- | ---------------- |
+| High          | 1                |
+| Medium        | 1                |
+| Low           | 4                |
+| Informational | 2                |
 
 **Alerts (From Scan Report)**
 
-| Name | Risk Level | Number of Instances |
-| --- | --- | --- | 
-| Cross Site Scripting (DOM Based) | High | 1 | 
-| X-Frame-Options Header Not Set | Medium | 3 | 
-| Absence of Anti-CSRF Tokens | Low | 3 | 
-| Cookie No HttpOnly Flag | Low | 1 | 
-| Cookie Without SameSite Attribute | Low | 1 | 
-| X-Content-Type-Options Header Missing | Low | 19 | 
-| Information Disclosure - Sensitive Information in URL | Informational | 3 | 
-| Information Disclosure - Suspicious Comments | Informational | 1 | 
+| Name                                                  | Risk Level    | Number of Instances |
+| ----------------------------------------------------- | ------------- | ------------------- |
+| Cross Site Scripting (DOM Based)                      | High          | 1                   |
+| X-Frame-Options Header Not Set                        | Medium        | 3                   |
+| Absence of Anti-CSRF Tokens                           | Low           | 3                   |
+| Cookie No HttpOnly Flag                               | Low           | 1                   |
+| Cookie Without SameSite Attribute                     | Low           | 1                   |
+| X-Content-Type-Options Header Missing                 | Low           | 19                  |
+| Information Disclosure - Sensitive Information in URL | Informational | 3                   |
+| Information Disclosure - Suspicious Comments          | Informational | 1                   |
 
 **Alerts (Manual test comparing ZAP)**
 
-| Name | Risk Level | Number of Instances | **False Positive**
-| --- | --- | --- | --- | 
-| Cross Site Scripting (DOM Based) | High | 1 | **Yes**|
-| X-Frame-Options Header Not Set | Medium | 3 | **No**|
-| Absence of Anti-CSRF Tokens | Low | 3 | **No**|
-| Cookie No HttpOnly Flag | Low | 1 | **No**|
-| Cookie Without SameSite Attribute | Low | 1 | **No**|
-| X-Content-Type-Options Header Missing | Low | 19 | **No**|
-| Information Disclosure - Sensitive Information in URL | Informational | 3 | **No**|
-| Information Disclosure - Suspicious Comments | Informational | 1 | **No**|
+| Name                                                  | Risk Level    | Number of Instances | **False Positive** |
+| ----------------------------------------------------- | ------------- | ------------------- | ------------------ |
+| Cross Site Scripting (DOM Based)                      | High          | 1                   | **Yes**            |
+| X-Frame-Options Header Not Set                        | Medium        | 3                   | **No**             |
+| Absence of Anti-CSRF Tokens                           | Low           | 3                   | **No**             |
+| Cookie No HttpOnly Flag                               | Low           | 1                   | **No**             |
+| Cookie Without SameSite Attribute                     | Low           | 1                   | **No**             |
+| X-Content-Type-Options Header Missing                 | Low           | 19                  | **No**             |
+| Information Disclosure - Sensitive Information in URL | Informational | 3                   | **No**             |
+| Information Disclosure - Suspicious Comments          | Informational | 1                   | **No**             |
 
 
 __3. Now you have collected enough information about the victim web application and found
