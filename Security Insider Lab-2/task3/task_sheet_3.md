@@ -92,8 +92,8 @@ __solution :__
 | SQL Injection           | /vbank_code/pages/htbloanreq.page line 30     | mysql_real_escape_string | ---                                                             | POSITIVE        |
 | File Inclusion          | vbank_code/etc/htb.inc line 24                | ---                      | There are no `include_once()` methods accepting user input      | FALSE POSITIVE  |
 | Code Execution          | vbank_code/pages/htbdetails.page line 95      | Whitelisting             | ---                                                             | POSITIVE        |
-| Cross-Site Scripting    | /vbank_code/pages/htbdetails.page line 85,102 | htmlspecialchars         | ---                                                             | FALSE NEGAt;IVE |
-| Session Fixation        | /vbank_code/etc/htb.inc line 53               | ---                      | There is no `setcookie` method accepting user input             | FALSE POSITIVE  |
+| Cross-Site Scripting    | /vbank_code/pages/htbdetails.page line 85,102 | htmlspecialchars         | ---                                                             | FALSE POSITIVE |
+| Session Fixation        | /vbank_code/etc/htb.inc line 53               | ---                      | There is no `setcookie` method accepting user input             | POSITIVE  |
 | HTTP Response Splitting | vbank_code/etc/htb.inc line 27                | ---                      | The `URL` used in `header` method already have a security check | FALSE POSITIVE  |
 | Reflection Injection    | vbank_code/htdocs/index.php line 21           | ---                      | `ob_start()` is not accepting user input                        | FALSE POSITIVE  |
 
@@ -114,6 +114,8 @@ __solution :__
    ![RIPS_CODE_EXE](../task3/images/RIPS_CODE_EXE.JPG)
    <br/>
    - Security patch 
+<!--    - TODO: htmlspecialchars($http['query'])  -->
+
    ``` php
       $whitelists  = ['system','phpinfo']	;			
                      $string = $http['query'];
