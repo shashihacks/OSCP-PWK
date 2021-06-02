@@ -90,7 +90,7 @@ __solution :__
 | Vulnerability type      | location                                      | security patch                        | Test case                                                                        | Result         |
 | ----------------------- | --------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------- | -------------- |
 | SQL Injection           | /vbank_code/pages/htbloanreq.page line 30     | mysql_real_escape_string()            | ---                                                                              | POSITIVE       |
-| File Inclusion          | vbank_code/etc/htb.inc line 24                | ---                                   | There are no `include_once()` methods accepting user input                       | POSITIVE       |
+| File Inclusion          | vbank_code/etc/htb.inc line 24                | Whitelist                             | There are no `include_once()` methods accepting user input                       | POSITIVE       |
 | Code Execution          | vbank_code/pages/htbdetails.page line 95      | `preg_match('/^[a-zA-Z\d]+$/', $str)` | '.phpinfo().'                                                                    | POSITIVE       |
 | Cross-Site Scripting    | /vbank_code/pages/htbdetails.page line 85,102 | htmlspecialchars                      | `<script>alert(1)</script>`                                                      | POSITIVE       |
 | Session Fixation        | /vbank_code/etc/htb.inc line 53               | session_regenerate_id(true)           | session_regenerate_id(true)  There is no `setcookie` method accepting user input | POSITIVE       |
@@ -134,14 +134,14 @@ __solution :__
   
 
 #### Vulnerabilities Fix (Test ASST)         
-| Vulnerability type                          | location                                | security patch                    | Test | Test case | Result   |
-| ------------------------------------------- | --------------------------------------- | --------------------------------- | ---- | --------- | -------- |
-| SQL Injection                               | /vbank_code/htdocs/login.php line 17    | Preparedstatements                | ASST | ---       | POSITIVE |
-| Cross Site Scripting                        | /vbank_code/htdocs/login.php line 14,15 | htmlentities and htmlspecialchars | ASST | ---       | POSITIVE |
-| Cross-Site Request Forgery                  | vbank_code/pages/htbchgpwd.php          | CSRF Token                        | ASST | ---       | POSITIVE |
-| Sensitive Data Exposure Vulnerabilities     | Passwords are not stored in Hash        | HASH the password                 | ASST | ---       | ---      |
-| Using Components With Known Vulnerabilities | PHP Version is 5.6                      | Use new versions of PHP           | ASST | ---       | ---      |
-| Broken Authentication Vulnerabilities       | /vbank_code/pages/htbchgpwd.php         | **captcha**                       | ASST | ---       | ---      |
+| Vulnerability type                          | location                                | security patch                    | Test case                       | Result   |
+| ------------------------------------------- | --------------------------------------- | --------------------------------- | ------------------------------- | -------- |
+| SQL Injection                               | /vbank_code/htdocs/login.php line 17    | Preparedstatements                | alex'or'1'='1#                  | POSITIVE |
+| Cross Site Scripting                        | /vbank_code/htdocs/login.php line 14,15 | htmlentities and htmlspecialchars | `<script>alert('xss')</script>` | POSITIVE |
+| Cross-Site Request Forgery                  | vbank_code/pages/htbchgpwd.php          | CSRF Token                        | ---                             | POSITIVE |
+| Sensitive Data Exposure Vulnerabilities     | Passwords are not stored in Hash        | HASH the password                 | ---                             | ---      |
+| Using Components With Known Vulnerabilities | PHP Version is 5.6                      | Use new versions of PHP           | ---                             | ---      |
+| Broken Authentication Vulnerabilities       | /vbank_code/pages/htbchgpwd.php         | **captcha**                       | ---                             | ---      |
 
 **Test Cases:**
 - **SQL Injection**
@@ -177,8 +177,8 @@ __solution :__
    - Use the same token value on the server side to validate.
    - Additionally implement Same origin policy or send csrf token in as part of headers.
 
-![ASST_CSRF](../task3/images/ASST_CSRF.JPG)
-![ASST_CSRF_FIX](../task3/images/ASST_CSRF_FIX.JPG)
+![ASST_CSRF](../task3/images/ASST_CSRF.png)
+![ASST_CSRF_FIX](../task3/images/ASST_CSRF_FIX.png)
 
 
 - Even after fixing the code with a security patch, there are a lot of false positives because the tool is not sure of the integrity and security of data flow from input to output.
@@ -303,6 +303,7 @@ $: sqlmap -u 'http://192.168.37.128/login.php?username=alex' --dbs
 ```
 __Result:__
 
+
 ![sqlmap_dbs](../task3/images/sqlmap_dbs.PNG)
 
 - Found `vbank` database (along with others)
@@ -312,6 +313,8 @@ __Result:__
 ```bash
 └─$ sqlmap -u 'http://192.168.37.128/login.php?username=alex' -D vbank --dump            
 ```
+
+
 
 
 - Uploading a shell
