@@ -21,7 +21,7 @@ $9 = 100000
 (gdb) x/1tb &i
 0x7fffffffdff4: 00100000
 
-
+x/4xb &hello
 last5 characters
 (gdb) print hello
 $12 = 0x555555556008 "Hello world!"
