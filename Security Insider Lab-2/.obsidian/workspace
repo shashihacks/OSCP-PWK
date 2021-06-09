@@ -1,0 +1,91 @@
+{
+  "main": {
+    "id": "5c5337af0dd73084",
+    "type": "split",
+    "children": [
+      {
+        "id": "6e6fa96a2bae22cd",
+        "type": "leaf",
+        "state": {
+          "type": "empty",
+          "state": {}
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4db42d5160525621",
+    "type": "split",
+    "children": [
+      {
+        "id": "2a7cb5870781c524",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3c62438207dfd31b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "2e62f03b784d6d44",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "2d493f160f3c7a95",
+    "type": "split",
+    "children": [
+      {
+        "id": "b0c6c6df79295d87",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0f3850ade55b2b1a",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "6e6fa96a2bae22cd",
+  "lastOpenFiles": [
+    "task3/Part 3_ Implementing Secure Web Applications.md",
+    "task3/task_sheet_3.pdf",
+    "task4/README.md"
+  ]
+}
