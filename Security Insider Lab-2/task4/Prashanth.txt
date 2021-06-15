@@ -1,3 +1,12 @@
+1. uname -a
+  Linux kali 5.7.0-kali1-amd64 
+  ASLR - Address Space Layout Randomization
+  Data execution prevention NX never execute -z execstack
+  Stack Canaries  -fno-stack-protector 
+
+  Stack Canaries are a secret value placed on the stack which changes every time the program is started.
+  Prior to a function return, the stack canary is checked and if it appears to be modified, the program exits immeadiately.
+
 Address Space Layout Randomization - Random assignment of Addresses like heap, stack, libraries, main excecutable
 
 so we need to disable this in our kernal.
@@ -25,6 +34,7 @@ https://stackoverflow.com/questions/17775186/buffer-overflow-works-in-gdb-but-no
 to run a c program
 1 gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb example1.c -o example1
   gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb example3.c -o example3
+  gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb binsh.c -o binsh
 2 gdb example1 // load ,  run // run
 
 3 b mult
@@ -58,14 +68,30 @@ to run a c program
 
 12 print /t i
 
-13 x/1tb 
+13 x/1tb &i
 
-14 
+14 x/5c hello
+15 x/20bx hello
 
 
-3)
+Exercise 3)
 1 gdb -nx example
+
+b 9 
+info locals
+set variable i = 1
+print printf
+list printf
+info stack
 
 
 4)
 AAAAAAAAAAAAAAAAAAAA0@ 
+
+5)
+x/i printChar
+
+r 
+
+
+
