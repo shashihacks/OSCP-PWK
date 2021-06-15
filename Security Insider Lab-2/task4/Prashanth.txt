@@ -1,0 +1,97 @@
+1. uname -a
+  Linux kali 5.7.0-kali1-amd64 
+  ASLR - Address Space Layout Randomization
+  Data execution prevention NX never execute -z execstack
+  Stack Canaries  -fno-stack-protector 
+
+  Stack Canaries are a secret value placed on the stack which changes every time the program is started.
+  Prior to a function return, the stack canary is checked and if it appears to be modified, the program exits immeadiately.
+
+Address Space Layout Randomization - Random assignment of Addresses like heap, stack, libraries, main excecutable
+
+so we need to disable this in our kernal.
+
+check if it is enabled or disabled 
+cat /proc/sys/kernel/randomize_va_space
+0 -> diabled 2 -> enabled
+
+To disable
+sudo bash -c 'echo "kernel.randomize_va_space = 0" >> /etc/sysctl.conf'
+
+sudo sysctl -p // Reload
+
+cat /proc/sys/kernel/randomize_va_space // verify
+
+
+// debuging should be unlimited not zero
+ulimit -c unlimited
+
+ulimit -c
+
+// to run buffer overflows with out gdc 
+https://stackoverflow.com/questions/17775186/buffer-overflow-works-in-gdb-but-not-without-it
+2)
+to run a c program
+1 gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb example1.c -o example1
+  gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb example3.c -o example3
+  gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb binsh.c -o binsh
+2 gdb example1 // load ,  run // run
+
+3 b mult
+
+4 b linenumber
+
+5 List the source code at the positions you set the breakpoints.
+
+6  info b
+
+7 d 2
+
+8 run and print variables
+
+9 print i
+
+10 comm breakpoint number 21
+    print i
+    print result
+    end
+
+    or b 21
+    display i
+    display result
+
+    c
+
+
+11 b 5
+   c
+
+12 print /t i
+
+13 x/1tb &i
+
+14 x/5c hello
+15 x/20bx hello
+
+
+Exercise 3)
+1 gdb -nx example
+
+b 9 
+info locals
+set variable i = 1
+print printf
+list printf
+info stack
+
+
+4)
+AAAAAAAAAAAAAAAAAAAA0@ 
+
+5)
+x/i printChar
+
+r 
+
+
+

