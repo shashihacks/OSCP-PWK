@@ -1,11 +1,11 @@
 ### Exercise 1: Kernel features
 __a) What is your current kernel version? and which kind of security mechanisms does it support to prevent or to mitigate the risk of stack-based buffer overflow exploits?__
 __Solution :__ 
-- To check your kernal version use command `uname -a`
+- To check your kernel version use the command `uname -a`
   
  - ![img](../task4/images/kernal_version.JPG)
  - It supports 
-   - ASLR - Address Space Layout Randomization, Random assignment of Addresses like heap, stack, libraries, main excecutable.
+   - ASLR - Address Space Layout Randomization, Random assignment of Addresses like heap, stack, libraries, main executable.
    - Data execution prevention ( NX never execute )
    - Stack Canaries 
   
@@ -21,17 +21,17 @@ __Solution :__
 ### Exercise 2: GNU Debugger - Helpful commands
 
 __1) Compile the C program example1.c with gcc the GNU Compiler Collection (or clang) using
-the command line : gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb
+the command line : `gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb`
 Explain briefly why we used these options?__ 
-- Compile and run
+- Compile and run.
   
 ![img](../task4/images/compile_2_1.JPG)
 
-- `-m32` : to generate a 32 bit binary.
-- `-fno-stack-protector` : disable the stack canaries
-- `-z execstack` : to disable Data execution prevention so that the content in stack can be executed.
+- `-m32`: to generate a 32-bit binary.
+- `-fno-stack-protector` : disable the stack canaries.
+- `-z execstack` : to disable Data execution prevention so that the content in a stack can be executed.
 - `-mpreferred-stack-boundary=2` would align the stack by 4 bytes so that it becomes more consistent and easier to exploit.
-- `ggdb`:  produces debugging information specifically intended for **gdb**
+- `ggdb`:  produces debugging information specifically intended for GDB.
 
 __2) Load the program in gdb and run it. Indicate how you achieved this.__
 
@@ -45,7 +45,7 @@ __3)  Set a break point at the function `mult()`.__
 
 __4) Set a break point at a specific position within this function.__
 
-- To set a break point at 10th instruction of mult()
+- To set a break point at 10th instruction of mult().
 
 ![img](../task4/images/b_mult_f.JPG)
 
@@ -65,7 +65,7 @@ first time. Explain your results.__
 
 ![img](../task4/images/locals.JPG)
 
-- Garbage values are stored in local variables before initialization.
+- Garbage values are displayed in local variables before initialization.
 
 __9) Print the content of one single variable.__
 
@@ -107,7 +107,7 @@ __3) Display the address of printf and try to list the source code at this addre
 
 ![img](../task4/images/3_3.JPG)
 
-- printf is an external function so it didnt list the source code like the printHello (internal function of program).
+- `printf` is an external function so it didn't list the source code like the `printHello` (internal function of the program).
 
 __4) Use the info command to find out more about the current stack frame.__
 
@@ -120,7 +120,7 @@ __5) Display registers and stack__
  ### Exercise 4: Simple buffer overflow - Overwrite local variables
 
  __1) Shortly explain in your own words, why this program is vulnerable.__
- - The program is vulnerable because it reads user input till it receives EOF and there is no check on input size which will be stored buffer’s size. If the user input size is greater than buffer size, buffer overflow occours.
+ - The program is vulnerable because it reads user input till it receives EOF and there is no check on input size which will be stored buffer’s size. If the user input size is greater than the buffer size, a buffer overflow occurs.
 
 __2) show attack__
 
@@ -148,8 +148,8 @@ __4) Why is this exploit possible and how could a developer have prevented it?__
 
 __1) Briefly describe the normal behavior of this program and explain why this program is
 vulnerable.__
- - The program expects two cmd line arugments, arg1 will be copied into buffer and arg2 length is checked and passed to **fctPtr** if length is greater than 1 and **fctPtr** points to **printStr** function else points to **printChar**.
- - This program is vulnerable because the arg1 is copied into the stack without checking if the size is less than buffer, can overflow stack and can manuplate what fctPtr points. 
+ - The program expects two cmd line arguments, argument 1 will be copied into the buffer and arg2 length is checked and passed to `fctPtr` if the length is greater than 1 and `fctPtr` points to `printStr` function else point to `printChar`.
+ - This program is vulnerable because argument 1 is copied into the stack without checking if the size of the input is less than the buffer size, can overflow the stack, and can manipulate what fctPtr points. 
 
 __2) Indicate the input to this program and the tools you used to successfully exploit the program__
 
@@ -164,23 +164,31 @@ the control flow is if the argument2 length is not greater than 1 then i should 
 
 __5) Briefly describe a scenario in which you may get full control over a system due to this
 vulnerability__
+![img](../task4/images/5_5.JPG)
+the `fctPtr` can be pointed to system address, but this contains a null address so its hard to point to system function.
+![img](../task4/images/5_5.1.JPG)
 
+- But, in general, This vulnerability allows arbitrary code execution. A malicious attacker might be able to run
+arbitrarily random commands, thus injecting reverse shell may get full control over the system.
 ### Exercise 6: Buffer overflows - A more realistic exploit
 
 ### Exercise 7: Integer Overflow
 
 __1) Explain why you are able to crash the program and what type of error you encountered.__
 
-- Program expects two arguments arugment1 is passed to `atoi`  and typecasted to short and stored in s.
-- size of buffer is 
--  
+- Program expects two arguments arugment1 is passed to `atoi`  and stored in a variable `s` as short and argument2 will be copied into `buf` using `snprintf`.
+- size of the buffer is checked as `short`. and  `snprintf` uses `int` value to the argument which stores the maximum number of bytes into the buffer.
+
+- This typecasting results in using a numeric value that is outside of the range of short and buffer check can be bypassed.
+
+
 __2) Briefly explain the input you used to crash the program.__
 
 ![img](../task4/images/7_2.JPG)
 ![img](../task4/images/7_2.1.JPG)
 
 __3) Correct the code to avoid this vulnerability. Deliver the corrected code!__
-- Declare variable s as int 
+- Declare variable `s` as int 
 ![img](../task4/images/7_4.JPG)
 
 
