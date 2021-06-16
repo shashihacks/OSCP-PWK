@@ -1,0 +1,93 @@
+{
+  "main": {
+    "id": "561838356928c6bb",
+    "type": "split",
+    "children": [
+      {
+        "id": "17133680ef6351aa",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "task4.md",
+            "mode": "preview"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "65899412860ee55f",
+    "type": "split",
+    "children": [
+      {
+        "id": "22a2c415cbf2a587",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f48f24ba760b6583",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "4e90a3950fc5e4d1",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "3369c45f17548121",
+    "type": "split",
+    "children": [
+      {
+        "id": "bb2ddc746a231bdc",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "989f085501bd8f1e",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "task4.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "17133680ef6351aa",
+  "lastOpenFiles": [
+    "task4.md"
+  ]
+}
