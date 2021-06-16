@@ -1,9 +1,9 @@
 ### Exercise 1: Kernel features
 __a) What is your current kernel version? and which kind of security mechanisms does it support to prevent or to mitigate the risk of stack-based buffer overflow exploits?__
 __Solution :__ 
-- To check your kernel version use the command `uname -a`
+- To check your kernel version use the command `uname -a`.
   
- ![img](../task4/images/kernal_version.JPG)
+ ![kernal_version](../task4/images/kernal_version.JPG)
 
  - It supports 
    - __ASLR :__  Address Space Layout Randomization, Random assignment of addresses like heap, stack, libraries, main executable.
@@ -14,15 +14,15 @@ __Solution :__
 __b) Briefly explain how you can disable or circumvent these techniques.?__
 
 __Solution :__ 
-- To disable ASLR
+- To disable ASLR,
 
 ```bash
 sudo bash -c 'echo "kernel.randomize_va_space = 0" >> /etc/sysctl.conf'
 ```
 
-- To disable Data execution prevention add the following command to your compiling argument 
+- To disable Data execution prevention add the following command to your compiling argument, 
   - `-z execstack`
-- To disable Stack Canaries add the following command to your compiling argument. 
+- To disable Stack Canaries add the following command to your compiling argument,
   - `-fno-stack-protector`
 
 ### Exercise 2: GNU Debugger - Helpful commands
@@ -30,9 +30,9 @@ sudo bash -c 'echo "kernel.randomize_va_space = 0" >> /etc/sysctl.conf'
 __1) Compile the C program example1.c with gcc the GNU Compiler Collection (or clang) using
 the command line : `gcc -m32 -fno-stack-protector -z execstack -mpreferred-stack-boundary=2 -ggdb`
 Explain briefly why we used these options?__ 
-- Compile and run.
+- Compile and run,
   
-![img](../task4/images/compile_2_1.JPG)
+![compile_2_1](../task4/images/compile_2_1.JPG)
 
 - `-m32`: to generate a 32-bit binary.
 - `-fno-stack-protector` : disable the stack canaries.
@@ -43,76 +43,76 @@ Explain briefly why we used these options?__
 __2) Load the program in gdb and run it. Indicate how you achieved this.__
 
 __solution :__
-- To load the  program in `gdb`, run the following command in shell
+- To load the  program in `gdb`, run the following command in shell.
 
 ```bash
 $ gdb example1
 ```
 
-- To run the program use in `gdb`
+- To run the program use in `gdb`.
 
 ```bash
 gdb-peda: run
 ```
 
-![img](../task4/images/run_and_load.JPG)
+![run_and_load](../task4/images/run_and_load.JPG)
 
-- Using the script [PEDA](https://github.com/longld/peda) with gdb.
+- Using the script [PEDA](https://github.com/longld/peda) with GDB.
   
 __3)  Set a break point at the function `mult()`.__
 
-![img](../task4/images/b_mult.JPG)
+![b_mult](../task4/images/b_mult.JPG)
 
 __4) Set a break point at a specific position within this function.__
 
-- To set a break point inside `mult()`(in our case after 40 bytes) 
+- To set a break point inside `mult()`(in our case after 40 bytes).
 
-![img](../task4/images/b_mult_f.JPG)
+![b_mult_f](../task4/images/b_mult_f.JPG)
 
 __5) List the source code at the positions you set the breakpoints.__
 
-![img](../task4/images/list_code.JPG)
+![list_code](../task4/images/list_code.JPG)
 
 __6) List all breakpoints you set so far..__
 
-![img](../task4/images/list_break.JPG)
+![list_break](../task4/images/list_break.JPG)
 
 __7) Delete the second break point.__
 
-![img](../task4/images/delete_2.JPG)
+![delete_2](../task4/images/delete_2.JPG)
 __8) Run the program and print the local variables after the program has entered mult() for the
 first time. Explain your results.__
 
-![img](../task4/images/locals.JPG)
+![locals](../task4/images/locals.JPG)
 
 - Garbage values are displayed in local variables before initialization.
 
 __9) Print the content of one single variable.__
 
-![img](../task4/images/print_single.JPG)
+![print_single](../task4/images/print_single.JPG)
 __10) Print the content of the variables of interest during the execution of the for-loop in
 mult().(three iterations only!)__
-![img](../task4/images/duringex1.JPG)
-![img](../task4/images/duringex2.JPG)
-![img](../task4/images/duringex3.JPG)
-![img](../task4/images/duringex4.JPG)
+![duringex1](../task4/images/duringex1.JPG)
+![duringex2](../task4/images/duringex2.JPG)
+![duringex3](../task4/images/duringex3.JPG)
+![duringex4](../task4/images/duringex4.JPG)
 
 __11) Set a new break point at printHello() and execute the program until it reaches this break
 point without stepping through every single line of your source code.__
-![img](../task4/images/printhello.JPG)
-![img](../task4/images/printhello1.JPG)
-![img](../task4/images/printhello2.JPG)
+![printhello](../task4/images/printhello.JPG)
+![printhello1](../task4/images/printhello1.JPG)
+![printhello2](../task4/images/printhello2.JPG)
 
 
 __12) Print the local variable i in binary format.__
 __solution :__
-![img](../task4/images/binary.JPG)
+![binary](../task4/images/binary.JPG)
 
 
 __13) Print the last byte of the local variable i in binary format.__
 __solution :__
 
-![img](../task4/images/binary_last.JPG)
+![binary_last](../task4/images/binary_last.JPG)
 
 
 __14) Print the first five characters of the local variable hello in character format.__
@@ -136,37 +136,36 @@ __solution :__
 
 __1) Change the values of i and hello before the printf command in printHello() is executed (check your changes by printing the variables with commands of gdb).__
 __solution :__  
-![img](../task4/images/3_1.JPG)
-![img](../task4/images/3_1.1.JPG)
+![3_1](../task4/images/3_1.JPG)
+![3_1.1](../task4/images/3_1.1.JPG)
 
 __2) Change one single character within the string hello to hallo (assigning a new string differing in one character is not accepted here).__
 __solution :__  
 
-![img](../task4/images/3_2.JPG)
+![3_2](../task4/images/3_2.JPG)
 
 __3) Display the address of printf and try to list the source code at this address. Explain your results and repeat this task with the printHello() function__
 
-![img](../task4/images/3_3.JPG)
+![3_3](../task4/images/3_3.JPG)
 
 - `printf` is an external function so it didn't list the source code like the `printHello` (internal function of the program).
 
 __4) Use the info command to find out more about the current stack frame.__
 __solution :__
 
-![img](../task4/images/3_4.JPG)
+![3_4](../task4/images/3_4.JPG)
 
 __5) Display registers and stack__
 __solution :__
 
-![img](../task4/images/3_5.JPG)
+![3_5](../task4/images/3_5.JPG)
 
 
 ![stack_frame_printHello](../task4/images/print_hello_stack.PNG)
 
 
-<!-- - Main stack frame
-- stack pointer `$esp` points to top of the stack which contains `0x20` initially -->
-
+ Main stack frame
+- stack pointer `$esp` register points to top of the stack which contains `0x20` and also EIP  and current line points to same address.
  ### Exercise 4: Simple buffer overflow - Overwrite local variables
 
  __1) Shortly explain in your own words, why this program is vulnerable.__  
@@ -183,7 +182,7 @@ $  python -c "print('A'*20 + '\x30\x40\x20\x10')" | ./example2;
 
 
 ```
-![img](../task4/images/4_2.JPG)
+![4_2](../task4/images/4_2.JPG)
 
 __3) Show a memory layout of the main stack frame, before and after the exploit (draw and explain it).__
 
@@ -218,7 +217,7 @@ __solution :__
   }
 ```
 
-![img](../task4/images/4_4.JPG)
+![4_4](../task4/images/4_4.JPG)
 
 ### Exercise 5: Buffer overflows - Overwrite function pointers
 
@@ -234,9 +233,9 @@ __solution :__
   1. GDB debugger
   2. Python
 
-![img](../task4/images/5_2.1.JPG)
+![5_2.1](../task4/images/5_2.1.JPG)
 
-![img](../task4/images/5_2.JPG)
+![5_2](../task4/images/5_2.JPG)
 
 
 __3) Together with your input, outline the stack content before (this is, shortly before your input
@@ -254,11 +253,11 @@ __5) Briefly describe a scenario in which you may get full control over a system
 vulnerability__  
 __solution__
 
-![img](../task4/images/5_5.JPG)
+![5_5](../task4/images/5_5.JPG)
 
 the `fctPtr` can be pointed to system address, but this contains `null bytes`, which terminates the payload, unable to point to system function.
 
-![img](../task4/images/5_5.1.JPG)
+![5_5.1](../task4/images/5_5.1.JPG)
 
 - But in general, This vulnerability allows arbitrary code execution(if successfully pointed to `system`). A malicious attacker might be able to run  commands, thus one may get full control over the system.
 
@@ -284,9 +283,7 @@ int main(){
 }
 
 ```
-##screenshot todo
-
-
+![binsh](../task4/images/binsh.jpg)
 
 
 __3. comment your assembler code.__
@@ -497,7 +494,7 @@ and explain the relevant parts and positions of the arguments.__
 __3) Use the last two subtasks to explain the behavior of the given code when you omit the
 argument somestring. If possible verify your results with the printf function of gdb.__  
 __solution:__ 
-If format string is specifiefd and no parameter is passed, then it fetches the content from top of the stack (in ourr case `somestring`).
+If format string is specifiefd and no parameter is passed, then it fetches the content from top of the stack (in our case `somestring`).
 
 
 ![img](../task4/images/8_3.JPG)
