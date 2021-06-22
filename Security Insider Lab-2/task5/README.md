@@ -1,4 +1,5 @@
-### EXERCISE 1
+### Exercise 1: Valgrind
+
 
 1.
 
@@ -125,13 +126,12 @@ __Errors detected :__
 __Fix :__
 
 ```c
-
 int main()
 {
     int *x,*y;    
-    x = malloc(sizeof(int));
-    y = malloc(sizeof(int));
-    if(x != NULL && y != NULL) {    
+    x = malloc(sizeof(int));  //added
+    y = malloc(sizeof(int));   //added
+    if(x != NULL && y != NULL) {       //added
         printf("\nx: ");
         scanf("%d", x);
         printf("\ny: ");
@@ -141,7 +141,7 @@ int main()
         if(*(x) < *(y)) printf("x<y\n");
     }
   
-    free(x);free(y); 
+    free(x);free(y);  //added
     return 0;
 }
 
@@ -239,7 +239,7 @@ if (len(simgr.found) > 0):
 ### Exercise 4: American Fuzzy Lop (afl)
 
 
-### Reverse engineering
+### Exercise 5: Reverse engineering
 
 __1. Check for implemented security features. What did you find?__
 
