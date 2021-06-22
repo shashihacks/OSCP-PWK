@@ -383,9 +383,8 @@ R007B0553210
 
 __4. Propose a better way to protect the program__
 __solution :__
-1. Use code obfuscation.
-2. Detecting debuggers and sandboxes
-3. Strip the symbols
+1. Code obfuscation.
+3. Strip the symbols 
 4. randomize the stored data
 5. Runtime calculations of data
 
@@ -502,4 +501,94 @@ iVar2 = connect(socket_socket,(sockaddr *)local_478,0x10)
       if (local_54 < 0) {
         error("ERROR writing to socket");
       }
+```
+
+__2. In real life engagements, what steps should a malware anaylzer follow to understand a
+malware without being infected with it.__
+
+__solution :__
+1. Combine static and dynamic analysis
+2. Run in isolated environments like virtual machines when using dynamic analysis
+3. Use sandboxe environments, for not being infected by the malware when analysing.
+4. Try reversing the binary file, for finding potential functionalities.
+5. Making use of disassemblers
+
+__3. What tricks and protection mechanisms does this malware implement? How did you find it?__
+
+__solution:__
+- Tricks and Protection mechanisms:
+
+1. Use of packers (`upx packer`): Found when binary is run using `strings`
+
+Sample output from `strings`
+
+```bash
+┌──(shashi@kali)-[~/lab2/LabCode_Part5]
+└─$ strings worse 
+UPX!
+/lib64
+nux-x86-
+so.2
+Qc;@
+exihtons
+fopen
+trncmp
+rro{
+c!nec*ftell
+mkdir/l6fseek
+emcpy
+m!caAbzQo
+h"tbyna3
+read'r
+wB__cxa_f
+_1wt_W
+VGLIBC_2.14
+ITM_jegi&
+TablLgm
+L_*(
+@l 0 
+o7H9
+='0R
+5U0;
+/       DU3G
+m{      T
+AWAVQ
+AUAK%
+{[]A\
+FOBYFGYAOYEC
+E@YG
+thebeau
+tifulrabbi      sjumpingaroundlol
+a7nyZ
+.com
+nice try noob 
+l ^_^
+%02X
+/etc/p
+asswd
+ERROR }_ 
+        ZG-
+,Nde
+        ailed!"P&
+LtoO a
+/qwerty
+1337.php
+;*3$"
+USQRH
+PROT_EXEC|PROT_WRITE failed.
+$Info: This file is packed with the UPX executable packer http://upx.sf.net $
+$Id: UPX 3.94 Copyright (C) 1996-2017 the UPX Team. All Rights Reserved. $
+
+...
+
+```
+
+
+2. using memset to clear memory blocks after accessing `etc/passwd` file
+3. encrypting credentials and ip and decrypting it later.
+    - found when binary is disassembled using `Ghidra`
+
+```c++
+    decryptip(local_486)
+    decryptcred(local_498);
 ```
