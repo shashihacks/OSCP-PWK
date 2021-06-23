@@ -337,6 +337,36 @@ if (len(simgr.found) > 0):
 
 ### Exercise 4: American Fuzzy Lop (afl)
 
+__1. Some of the testers remarked that is crashes sometimes. One tester just remembered that
+the input that caused the crash was 4 lowercase chars (this info is just to speed your fuzzing).__
+__solution :__
+- Crash case
+
+```
+┌──(kali@kali)-[~/lab2/LabCode_Part5]
+└─$ ./crash1.o   
+Please give your token :
+????????????????????????????????st
+*** stack smashing detected ***: terminated
+zsh: abort      ./crash1.o
+
+```
+
+__2. Compile afl with QEMU support. Why we need this?__
+
+```bash
+──(kali@kali)-[~/lab2/LabCode_Part5/afl]
+└─$ ./afl-fuzz -i limited -Q -o ../results3  ../crash1.o
+```
+ 
+- `limited`: directory contaioning test case files
+- `-Q` : run in `QEMU` mode.
+- `-o` output folder
+
+- `QEMU` is used for emulation similar to virtual machines, It uses dynamic translation for better emulation speed.
+- QEMU allows emuilation for user-level processes, where aopplication can be comiled and run cross-architectures.
+
+
 
 ### Exercise 5: Reverse engineering
 
@@ -609,7 +639,7 @@ __solution :__
 1. Combine static and dynamic analysis
 2. Run in isolated environments like virtual machines when using dynamic analysis
 3. Use sandboxe environments, for not being infected by the malware when analysing.
-4. Try reversing the binary file, for finding potential functionalities.
+4. Try reversing the binary file before executing, for finding potential functionalities.
 5. Making use of disassemblers
 
 __3. What tricks and protection mechanisms does this malware implement? How did you find it?__
