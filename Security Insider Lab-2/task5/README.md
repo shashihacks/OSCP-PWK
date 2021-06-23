@@ -238,6 +238,25 @@ if (len(simgr.found) > 0):
 
 ### Exercise 4: American Fuzzy Lop (afl)
 
+__1. Some of the testers remarked that is crashes sometimes. One tester just remembered that
+the input that caused the crash was 4 lowercase chars (this info is just to speed your fuzzing).__
+
+
+__2. Compile afl with QEMU support. Why we need this?__
+
+```bash
+──(kali㉿kali)-[~/lab2/LabCode_Part5/afl]
+└─$ ./afl-fuzz -i limited -Q -o ../results3  ../crash1.o
+```
+ 
+- `limited`: directory contaioning test case files
+- `-Q` : run in `QEMU` mode.
+- `-o` output folder
+
+- `QEMU` is used for emulation similar to virtual machines, It uses dynamic translation for better emulation speed.
+- QEMU allows emuilation for user-level processes, where aopplication can be comiled and run cross-architectures.
+
+
 
 ### Exercise 5: Reverse engineering
 
