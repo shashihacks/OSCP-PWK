@@ -240,12 +240,23 @@ if (len(simgr.found) > 0):
 
 __1. Some of the testers remarked that is crashes sometimes. One tester just remembered that
 the input that caused the crash was 4 lowercase chars (this info is just to speed your fuzzing).__
+__solution :__
+- Crash case
 
+```
+┌──(kali@kali)-[~/lab2/LabCode_Part5]
+└─$ ./crash1.o   
+Please give your token :
+????????????????????????????????st
+*** stack smashing detected ***: terminated
+zsh: abort      ./crash1.o
+
+```
 
 __2. Compile afl with QEMU support. Why we need this?__
 
 ```bash
-──(kali㉿kali)-[~/lab2/LabCode_Part5/afl]
+──(kali@kali)-[~/lab2/LabCode_Part5/afl]
 └─$ ./afl-fuzz -i limited -Q -o ../results3  ../crash1.o
 ```
  
