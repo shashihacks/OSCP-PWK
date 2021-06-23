@@ -189,19 +189,23 @@ __Result__
 `sudo docker run --rm -ti --ulimit='stack=-1:-1' klee/klee`
 
 __1. Include the file ”klee.h” in you source code.__
+
+__solution__ 
+```c
+#include<stdio.h>
+```
 __2. Choose which variable(s) should be symbolic by using the function” klee_make_symbolic” and adjust the code.__
 __Solution :__
 
 
 - Create crackme2.c file in KLEE container with following code.
-   
+
+- Variable chose `usrInput`
+
 ```c
 #include<stdio.h>
 #include "klee/klee.h" // add header (question 1)
-// crackme2.c
-// Sample crackme using a weak hash function for validation
-// _______________________________
-// Checking if the serial number is valid ?
+
 int checkSerial(int a) {
 	if((((((a << 0x15) | (a >> 0x15)) ^ 0xDEADBEEF) + 0xDEADBEEF) == 0x2f5b7b03)){
 			// Validated serial number !
@@ -214,10 +218,9 @@ int checkSerial(int a) {
 int main(int argc, char **argv) {
 	unsigned int usrInput;
 	printf("Please enter a hex serial number to validate this program (e.g. AABBCCDD):\n");
-	//scanf("%8x", &usrInput); // commented this line (question 2)
 	printf("_____________");
 	printf("\nYour serial [%X] is ", usrInput);
-	klee_make_symbolic(&usrInput, sizeof(usrInput), "usrInput"); // add this line (question 2)
+	klee_make_symbolic(&usrInput, sizeof(usrInput), "usrInput"); // added this line (question 2)
 	printf("%s" ,checkSerial(usrInput)?"valid.\nThank you.\n":"invalid.\n");
 	return checkSerial(usrInput) ;
 }
@@ -238,7 +241,7 @@ problem.__
 __6. Is this result valid?__
 
 - When `ktest-tool klee-last/test000002.ktest` is ran we obtain a hex value  `object 0: hex : 0x7004605f` 
--  yes, the result is valid. This Hex value is in little indine format so a valid serial key is `5F600470`
+-  yes, the result is valid. This Hex value is in little endian format so a valid serial key is `5F600470`
 
 ![ValidKey_1](../task5/images/ValidKey_1.JPG)
 
