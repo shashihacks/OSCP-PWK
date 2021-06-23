@@ -510,7 +510,7 @@ __solution :__
 1. Combine static and dynamic analysis
 2. Run in isolated environments like virtual machines when using dynamic analysis
 3. Use sandboxe environments, for not being infected by the malware when analysing.
-4. Try reversing the binary file, for finding potential functionalities.
+4. Try reversing the binary file before executing, for finding potential functionalities.
 5. Making use of disassemblers
 
 __3. What tricks and protection mechanisms does this malware implement? How did you find it?__
