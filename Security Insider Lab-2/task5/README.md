@@ -8,6 +8,12 @@ Compiling c source code with gcc
 $: gcc A.c -o a.out
 ```
 
+
+- command used to analyse the binary using valgrind
+
+```c
+valgrind --leak-check=full --show-leak-kinds=all  --track-origins=yes --verbose --log-file=valgrind-out.txt ./<binary>
+```
 __Errors detected :__
 
 ![heap_block_overrun](../task5/images/heap_block_overrun.PNG)
@@ -305,8 +311,8 @@ import angr
 import claripy
 
 
-SUCCESS_ADDR = 0x00400677
-FAILURE_ADDR = 0x00400683
+SUCCESS_ADDR = 0x00400677 // address of success message
+FAILURE_ADDR = 0x00400683  // address of  failure case when wrong password is entered
 FLAG_LEN = 6
 STDIN_FD = 0
 
@@ -641,7 +647,7 @@ malware without being infected with it.__
 __solution :__
 1. Combine static and dynamic analysis
 2. Run in isolated environments like virtual machines when using dynamic analysis
-3. Use sandboxe environments, for not being infected by the malware when analysing.
+3. Use sandbox environments, for not being infected by the malware when analysing.
 4. Try reversing the binary file before executing, for finding potential functionalities.
 5. Making use of disassemblers
 
