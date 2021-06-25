@@ -206,7 +206,7 @@ __Solution :__
 
 - Create crackme2.c file in KLEE container with following code.
 
-- Variable chose `usrInput`
+- Variable chosen `usrInput`
 
 ```c
 #include<stdio.h>
@@ -313,17 +313,27 @@ import claripy
 
 SUCCESS_ADDR = 0x00400677 // address of success message
 FAILURE_ADDR = 0x00400683  // address of  failure case when wrong password is entered
-FLAG_LEN = 6
-STDIN_FD = 0
+FLAG_LEN = 6  // 6 chars length, found from disassembler
+STDIN_FD = 0  // standard input : file descriptor
 
 
-base_addr = 0x00400000 # To match addresses to Ghidra
+base_addr = 0x00400000 # To match addresses to (Ghidra) where the program is starting
 
 proj = angr.Project("./crackme3.o", main_opts={'base_addr': base_addr}) 
-
+# Angr solver engine is called claripy
+# BVS =  Bit Vector whether symbolic(with a name)
+# flag_ is variable name
+# %d is format specifier
+#  8 bits (1 byte)
 flag_chars = [claripy.BVS('flag_%d' % i, 8) for i in range(FLAG_LEN)]
-flag = claripy.Concat( *flag_chars + [claripy.BVV(b'\n')]) # Add \n for scanf() to accept the input
 
+
+# concatenate the chars
+#BVV - not symbolic but actual value
+flag = claripy.Concat( *flag_chars + [claripy.BVV(b'\n')]) 
+
+#initialize the state  
+#Use the unicorn engine.
 state = proj.factory.full_init_state(
         args=['./crackme3.out'],
         add_options=angr.options.unicorn,
@@ -352,17 +362,17 @@ __solution :__
 - Crash case
 
 ```
-┌──(kali@kali)-[~/lab2/LabCode_Part5]
+──(shashi@kali)-[~/lab2/LabCode_Part5]
 └─$ ./crash1.o   
 Please give your token :
-????????????????????????????????st
-*** stack smashing detected ***: terminated
-zsh: abort      ./crash1.o
+nerd
+zsh: segmentation fault  ./crash1.o
 
 ```
 
 __2. Compile afl with QEMU support. Why we need this?__
 
+- Compilation
 ```bash
 ──(kali@kali)-[~/lab2/LabCode_Part5/afl]
 └─$ ./afl-fuzz -i limited -Q -o ../results3  ../crash1.o
@@ -375,6 +385,22 @@ __2. Compile afl with QEMU support. Why we need this?__
 - `QEMU` is used for emulation similar to virtual machines, It uses dynamic translation for better emulation speed.
 - QEMU allows emuilation for user-level processes, where aopplication can be comiled and run cross-architectures.
 
+
+3. Launch your fuzzing using afl-fuzz with adjusted parameters to find the crash case.
+Remember: The requested crash case is readable.
+
+__solution :__
+- Crash case found  `nerd`
+
+- Result 
+
+```
+──(shashi@kali)-[~/lab2/LabCode_Part5]
+└─$ ./crash1.o   
+Please give your token :
+nerd
+zsh: segmentation fault  ./crash1.o
+```
 
 
 ### Exercise 5: Reverse engineering
