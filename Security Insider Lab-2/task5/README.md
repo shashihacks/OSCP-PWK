@@ -120,10 +120,11 @@ __Result :__
 ```
 
 
-4. 
-__Errors detected :__
+4.  
 
-1. Uninitialized integers
+  __Errors detected :__
+
+  Uninitialized integers
 
 
 ![un_initialized_memory](../task5/images/example4.png)
@@ -132,24 +133,18 @@ __Errors detected :__
 __Fix :__
 
 ```c
-int main()
-{
-    int *x,*y;    
-    x = malloc(sizeof(int));  //added
-    y = malloc(sizeof(int));   //added
-    if(x != NULL && y != NULL) {       //added
-        printf("\nx: ");
-        scanf("%d", x);
-        printf("\ny: ");
-        scanf("%d", y); 
-        if(*(x) == *(y)) printf("x==y\n");
-        if(*(x) > *(y)) printf("x>y\n"); 
-        if(*(x) < *(y)) printf("x<y\n");
-    }
-  
-    free(x);free(y);  //added
-    return 0;
+
+int main() {
+	int x,y;
+	printf("\nx: ");
+	scanf("%d", &x);
+	printf("\ny: ");
+	scanf("%d", &y);
+	if(x==y)	printf("x==y\n");
+	if(x>y)		printf("x>y\n");
+	if(x<y)		printf("x<y\n");
 }
+
 
 ```
 
@@ -166,9 +161,11 @@ __Result :__
 ```
 
 
-5. 
-__Errors__
-1. Uninitialized  integer
+5.  
+
+  __Errors detected__
+
+  ​	Uninitialized  integer
 
 ![example5_uninitialized_x](../task5/images/example5.png)
 
@@ -377,7 +374,7 @@ __2. Compile afl with QEMU support. Why we need this?__
 ──(kali@kali)-[~/lab2/LabCode_Part5/afl]
 └─$ ./afl-fuzz -i limited -Q -o ../results3  ../crash1.o
 ```
- 
+
 - `limited`: directory contaioning test case files
 - `-Q` : run in `QEMU` mode.
 - `-o` output folder
@@ -655,10 +652,9 @@ iVar2 = connect(socket_socket,(sockaddr *)local_478,0x10)
     error("ERROR connecting");
   }
 ```
-13. use `write` to write the `etc/passswd` contents and prints "ERROR writing" if the read contnets is empty.
+13. use `write` to write the `etc/passswd` contents and prints "ERROR writing" if the read content is  empty.
 
-```
-    php_page = "/qwertylolnotqwerty1337.php"; 
+```c
       etc_buffer_length = strlen(etc_buffer);
       sVar3 = write(socket_socket,etc_buffer,etc_buffer_length);
       local_54 = (int)sVar3;
@@ -683,6 +679,7 @@ __solution:__
 - Tricks and Protection mechanisms:
 
 1. Use of packers (`upx packer`): Found when binary is run using `strings`
+
 
 Sample output from `strings`
 
@@ -747,10 +744,15 @@ $Id: UPX 3.94 Copyright (C) 1996-2017 the UPX Team. All Rights Reserved. $
 
 ```
 
+__unpacking__
+```bash
+$: upx -q -d worse
+```
 
+__Tricks and Functions__
 2. using memset to clear memory blocks after accessing `etc/passwd` file
 3. encrypting credentials and ip and decrypting it later.
-    - found when binary is disassembled using `Ghidra`
+-  found when binary is disassembled using `Ghidra`
 
 ```c++
     decryptip(local_486)

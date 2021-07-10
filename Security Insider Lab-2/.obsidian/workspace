@@ -4,14 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "fe0db46eb7bf3155",
+        "id": "f146169dfa70ac28",
         "type": "leaf",
         "state": {
-          "type": "markdown",
-          "state": {
-            "file": "task4/task4.md",
-            "mode": "preview"
-          }
+          "type": "empty",
+          "state": {}
         }
       }
     ],
@@ -68,7 +65,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "task4/task4.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -86,8 +82,10 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "fe0db46eb7bf3155",
+  "active": "f146169dfa70ac28",
   "lastOpenFiles": [
+    "task6/images/winpeas_lab_student.PNG",
+    "task6/sheet.md",
     "task4/task4.md",
     "Task_Sheet_2.md",
     "task3/Part 3_ Implementing Secure Web Applications.md",
